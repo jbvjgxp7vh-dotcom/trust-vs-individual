@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust vs Individual Ownership — Multi-Property Portfolio (Australia)</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3344;
+    --text: #e4e6ed;
+    --muted: #8b8fa3;
+    --accent: #6c8cff;
+    --green: #4ade80;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --green-bg: rgba(74, 222, 128, 0.08);
+    --red-bg: rgba(248, 113, 113, 0.08);
+    --amber-bg: rgba(251, 191, 36, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  /* Scoreboard */
+  .scoreboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .score-card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .score-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .score-card .detail {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 10px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Comparison table */
+  .comp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 24px;
+  }
+
+  .comp-table thead th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+
+  .comp-table thead th:first-child {
+    border-radius: 8px 0 0 0;
+    width: 220px;
+  }
+
+  .comp-table thead th:last-child {
+    border-radius: 0 8px 0 0;
+  }
+
+  .comp-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+    vertical-align: top;
+  }
+
+  .comp-table tbody tr:last-child td { border-bottom: none; }
+
+  .comp-table tbody td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  .comp-table tbody td:nth-child(2) {
+    background: var(--surface);
+  }
+
+  .comp-table tbody td:nth-child(3) {
+    background: var(--surface);
+  }
+
+  .verdict-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 6px;
+  }
+
+  .verdict-trust {
+    background: var(--green-bg);
+    color: var(--green);
+  }
+
+  .verdict-individual {
+    background: var(--amber-bg);
+    color: var(--amber);
+  }
+
+  .verdict-draw {
+    background: rgba(108, 140, 255, 0.1);
+    color: var(--accent);
+  }
+
+  .verdict-risk {
+    background: var(--red-bg);
+    color: var(--red);
+  }
+
+  /* Callout box */
+  .callout {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 0.85rem;
+  }
+
+  .callout strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+
+  /* Scenario cards */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .scenario-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .scenario-card:hover {
+    border-color: var(--accent);
+  }
+
+  .scenario-card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .scenario-card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .scenario-card .rec {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .rec-trust { background: var(--green-bg); color: var(--green); }
+  .rec-individual { background: var(--amber-bg); color: var(--amber); }
+  .rec-depends { background: rgba(108, 140, 255, 0.1); color: var(--accent); }
+
+  /* Cost estimator */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .cost-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .cost-col h3 {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cost-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.85rem;
+  }
+
+  .cost-line .amount { font-weight: 600; }
+
+  .cost-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0 0;
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* Property slider */
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .slider-row label {
+    font-size: 0.85rem;
+    min-width: 160px;
+  }
+
+  .slider-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+
+  .slider-row .slider-val {
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+    font-size: 1.1rem;
+  }
+
+  /* Decision matrix */
+  .matrix-row {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
+  .matrix-label {
+    background: var(--surface);
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px 0 0 6px;
+  }
+
+  .matrix-cell {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .matrix-cell:last-child { border-radius: 0 6px 6px 0; }
+
+  .cell-green { background: var(--green-bg); color: var(--green); }
+  .cell-red { background: var(--red-bg); color: var(--red); }
+  .cell-amber { background: var(--amber-bg); color: var(--amber); }
+  .cell-neutral { background: var(--surface2); color: var(--muted); }
+
+  .matrix-header {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+
+  .matrix-header span {
+    flex: 1;
+    text-align: center;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    padding: 8px;
+  }
+
+  .matrix-header span:first-child { min-width: 180px; }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 16px; }
+    .cost-grid { grid-template-columns: 1fr; }
+    .comp-table { font-size: 0.8rem; }
+    .matrix-label { min-width: 120px; font-size: 0.75rem; }
+    .matrix-cell { font-size: 0.72rem; padding: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Trust vs Individual Ownership</h1>
+<p class="subtitle">Multi-property portfolio in Australia · Mum + Dad as buyers · General guidance only — not legal or tax advice</p>
+
+<!-- Scoreboard -->
+<div class="scoreboard">
+  <div class="score-card">
+    <div class="label">Trust Wins</div>
+    <div class="value" style="color:var(--green)" id="trustWins">7</div>
+    <div class="detail">out of 12 factors</div>
+  </div>
+  <div class="score-card">
+    <div class="label">Individual Wins</div>
+    <div class="value" style="color:var(--amber)" id="indivWins">3</div>
+    <div class="detail">out of 12 factors</div>
+  </div>
+  <div class="score-card">
+    <div class="label">Depends / Draw</div>
+    <div class="value" style="color:var(--accent)" id="drawCount">2</div>
+    <div class="detail">out of 12 factors</div>
+  </div>
+  <div class="score-card">
+    <div class="label">Setup Cost (Trust)</div>
+    <div class="value" id="setupCost">$2.5k–$5k</div>
+    <div class="detail">+ ~$1.5k/yr ongoing</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+  <button class="tab-btn" onclick="showTab('detailed')">Detailed Comparison</button>
+  <button class="tab-btn" onclick="showTab('tax')">Tax Deep-Dive</button>
+  <button class="tab-btn" onclick="showTab('costs')">Cost Estimator</button>
+  <button class="tab-btn" onclick="showTab('scenarios')">Scenarios</button>
+  <button class="tab-btn" onclick="showTab('matrix')">Decision Matrix</button>
+</div>
+
+<!-- OVERVIEW TAB -->
+<div class="tab-content active" id="tab-overview">
+
+  <div class="callout">
+    <strong>Key takeaway</strong>
+    For a growing multi-property portfolio, a discretionary family trust generally wins on asset protection, flexibility, and tax planning — but the lending disadvantage (no negative gearing pass-through) is the single biggest practical hurdle that stops many investors.
+  </div>
+
+  <table class="comp-table">
+    <thead>
+      <tr><th>Factor</th><th>Trust (Discretionary / Family)</th><th>Individual (Joint Tenants / TiC)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Asset Protection</td>
+        <td>Assets sit outside personal names — shielded from personal creditors, lawsuits, bankruptcy
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Properties are personal assets — exposed to personal liability, divorce, and creditor claims</td>
+      </tr>
+      <tr>
+        <td>Tax Flexibility</td>
+        <td>Distribute income to any beneficiary each year (adult children, companies, other trusts) — choose the lowest-taxed recipient
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Income split is fixed 50/50 (JT) or per ownership % (TiC) — no year-to-year flexibility</td>
+      </tr>
+      <tr>
+        <td>Negative Gearing</td>
+        <td>Trust losses are trapped inside the trust until it has net income — cannot pass to individuals' taxable income
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Losses offset personal salary/wages immediately — real cashflow benefit in early years</td>
+      </tr>
+      <tr>
+        <td>Land Tax</td>
+        <td>Trusts generally lose the tax-free threshold in most states (NSW, VIC, QLD surcharge or no threshold)
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Each individual gets their own tax-free threshold — significant saving at lower portfolio values</td>
+      </tr>
+      <tr>
+        <td>CGT Discount</td>
+        <td>50% CGT discount available when distributed to individual beneficiaries (hold &gt;12 months)
+          <div class="verdict-tag verdict-draw">Draw</div>
+        </td>
+        <td>50% CGT discount applies directly to each owner</td>
+      </tr>
+      <tr>
+        <td>Estate Planning</td>
+        <td>No probate — trust assets pass outside the will. Change beneficiaries without stamp duty or transfer costs
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Properties pass through the estate — probate fees, potential disputes, stamp duty on transfer to beneficiaries in some states</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- DETAILED TAB -->
+<div class="tab-content" id="tab-detailed">
+
+  <table class="comp-table">
+    <thead>
+      <tr><th>Factor</th><th>Trust</th><th>Individual</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Setup Complexity</td>
+        <td>Need trust deed, TFN, ABN, bank account. Ongoing: annual tax return, minutes, distribution resolutions.
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Buy in personal names — minimal paperwork beyond the purchase itself.</td>
+      </tr>
+      <tr>
+        <td>Lending / Serviceability</td>
+        <td>Banks assess trust lending more conservatively. Some lenders won't lend to trusts at all. Guarantor structures get complicated. Maximum LVR sometimes capped at 80%.
+          <div class="verdict-tag verdict-risk">Caution</div>
+        </td>
+        <td>Standard residential lending. 90%+ LVR available. Simpler broker conversations. PAYG income directly counted.</td>
+      </tr>
+      <tr>
+        <td>Income Distribution</td>
+        <td>Trustee resolves distribution annually before 30 June. Can stream capital gains and franked dividends separately. Full flexibility across all beneficiaries in the trust deed.
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Fixed by ownership structure. Cannot change without transferring ownership (triggering stamp duty + CGT).</td>
+      </tr>
+      <tr>
+        <td>Stamp Duty on Purchase</td>
+        <td>Same stamp duty on acquisition. But changing trustee or vesting can trigger additional duty in some states.
+          <div class="verdict-tag verdict-draw">Draw</div>
+        </td>
+        <td>Standard stamp duty. Changing ownership share (TiC) triggers additional duty.</td>
+      </tr>
+      <tr>
+        <td>PPOR Exemption</td>
+        <td>Trust CANNOT access the main residence CGT exemption — ever.
+          <div class="verdict-tag verdict-risk">Trust risk</div>
+        </td>
+        <td>Full main residence exemption available if one owner lives in it.</td>
+      </tr>
+      <tr>
+        <td>Family Law (Divorce)</td>
+        <td>Trust assets are harder to divide but NOT immune — family court can "look through" trusts. Still provides a structural barrier and negotiation complexity.
+          <div class="verdict-tag verdict-trust">Trust advantage</div>
+        </td>
+        <td>Properties are directly in the asset pool — split per court orders with no structural barriers.</td>
+      </tr>
+      <tr>
+        <td>Succession on Death</td>
+        <td>Trust continues. No stamp duty on death. Appointor/guardian roles transfer per deed. No probate delay.
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>JT: surviving owner gets it automatically. TiC: goes through estate/will — probate, potential challenges, stamp duty in some states.</td>
+      </tr>
+      <tr>
+        <td>Trust Vesting</td>
+        <td>Trusts have a vesting date (usually 80 years from creation). At vesting, all assets are distributed — potential CGT + stamp duty event.
+          <div class="verdict-tag verdict-risk">Trust risk</div>
+        </td>
+        <td>No equivalent time limit.</td>
+      </tr>
+      <tr>
+        <td>Privacy</td>
+        <td>Ownership not directly searchable by name (trustee entity, often a company, appears on title). Trust deed is private.
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Names appear on title search — publicly discoverable.</td>
+      </tr>
+      <tr>
+        <td>Multiple Properties</td>
+        <td>All properties under one entity — simpler portfolio management, one tax return, one bank relationship.
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Each property is an asset of the individuals — scales fine but no structural separation between properties.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TAX DEEP-DIVE TAB -->
+<div class="tab-content" id="tab-tax">
+
+  <div class="callout">
+    <strong>The negative gearing trade-off</strong>
+    In early years with high interest costs and low rent, properties often run at a loss. Individuals claim that loss against salary immediately. A trust traps the loss — it carries forward until the trust is net positive. This is the #1 reason some investors stay in personal names early, then consider a trust once the portfolio is cashflow-positive.
+  </div>
+
+  <table class="comp-table">
+    <thead>
+      <tr><th>Tax Aspect</th><th>Trust</th><th>Individual</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Marginal Tax Rate Optimisation</td>
+        <td>Distribute to lowest-taxed beneficiary. If Mum earns $40k and Dad earns $180k, all rental income goes to Mum. Next year, distribute to adult child earning $0.
+          <div class="verdict-tag verdict-trust">Major advantage</div>
+        </td>
+        <td>Locked to ownership split. If 50/50, high-earner pays top rate on their half.</td>
+      </tr>
+      <tr>
+        <td>Rental Losses (Neg Gearing)</td>
+        <td>Trapped in trust. Carried forward. Only offset future trust income.
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Offset against salary/wages immediately. Tax refund in hand.</td>
+      </tr>
+      <tr>
+        <td>Capital Gains on Sale</td>
+        <td>Trust distributes capital gain to chosen beneficiary. 50% discount available if distributed to individuals. Can split gains across multiple beneficiaries.
+          <div class="verdict-tag verdict-trust">Trust wins</div>
+        </td>
+        <td>Gain taxed per ownership share. 50% discount per individual. No ability to redirect gains.</td>
+      </tr>
+      <tr>
+        <td>Land Tax (NSW)</td>
+        <td>Fixed trusts: $100 + 1.6% (over $100). Non-fixed: surcharge rate of 2% applies on top. No $1.075M threshold for non-fixed trusts (2024-25 rates).
+          <div class="verdict-tag verdict-risk">Trust penalty</div>
+        </td>
+        <td>Each individual: tax-free threshold $1,075,000 (2024-25). Combined couple effectively $2.15M before any land tax.</td>
+      </tr>
+      <tr>
+        <td>Land Tax (VIC)</td>
+        <td>Trusts lose the general threshold ($50k surcharge threshold in 2024). Trust surcharge of 0.375% applies.
+          <div class="verdict-tag verdict-risk">Trust penalty</div>
+        </td>
+        <td>Individual threshold $300k (2024). Each person gets their own.</td>
+      </tr>
+      <tr>
+        <td>Land Tax (QLD)</td>
+        <td>Trusts get $350k threshold but pay surcharge of 0.5% on total taxable value over $350k (2024-25).
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Individual threshold $600k each (2024-25). No surcharge.</td>
+      </tr>
+      <tr>
+        <td>Depreciation</td>
+        <td>Claimed at trust level. Offsets trust income only (compounds the loss-trapping problem in early years).
+          <div class="verdict-tag verdict-individual">Individual wins</div>
+        </td>
+        <td>Claimed personally — directly reduces taxable income alongside rental loss.</td>
+      </tr>
+      <tr>
+        <td>Section 100A Risk</td>
+        <td>ATO targeting distributions where money doesn't follow the resolution (e.g. distribute to adult child but parents keep the cash). Must be genuine. Reimbursement agreements are void.
+          <div class="verdict-tag verdict-risk">Trust risk</div>
+        </td>
+        <td>No equivalent risk — income is what it is.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- COST ESTIMATOR TAB -->
+<div class="tab-content" id="tab-costs">
+
+  <div class="slider-row">
+    <label>Number of properties</label>
+    <input type="range" id="propCount" min="1" max="10" value="3" oninput="updateCosts()">
+    <span class="slider-val" id="propCountVal">3</span>
+  </div>
+
+  <div class="slider-row">
+    <label>Avg. property value</label>
+    <input type="range" id="propValue" min="300" max="2000" step="50" value="650" oninput="updateCosts()">
+    <span class="slider-val" id="propValueVal">$650k</span>
+  </div>
+
+  <div class="slider-row">
+    <label>Annual rental yield</label>
+    <input type="range" id="rentalYield" min="2" max="8" step="0.5" value="5" oninput="updateCosts()">
+    <span class="slider-val" id="rentalYieldVal">5.0%</span>
+  </div>
+
+  <div class="cost-grid">
+    <div class="cost-col">
+      <h3 style="color:var(--green)">Trust Structure</h3>
+      <div class="cost-line"><span>Trust deed setup</span><span class="amount" id="c_deed">$2,500</span></div>
+      <div class="cost-line"><span>Corporate trustee setup (Pty Ltd)</span><span class="amount" id="c_company">$1,200</span></div>
+      <div class="cost-line"><span>ABN / TFN registration</span><span class="amount">$0</span></div>
+      <div class="cost-line"><span>ASIC annual fee (company)</span><span class="amount">$310/yr</span></div>
+      <div class="cost-line"><span>Trust tax return (accountant)</span><span class="amount" id="c_taxReturn">$1,500/yr</span></div>
+      <div class="cost-line"><span>Company tax return</span><span class="amount">$500/yr</span></div>
+      <div class="cost-line"><span>Land tax surcharge (est.)</span><span class="amount" id="c_landTax">varies</span></div>
+      <div class="cost-total"><span>Year 1 total (est.)</span><span id="c_trustY1">—</span></div>
+      <div class="cost-total"><span>Ongoing per year (est.)</span><span id="c_trustOngoing">—</span></div>
+    </div>
+    <div class="cost-col">
+      <h3 style="color:var(--amber)">Individual (Joint Names)</h3>
+      <div class="cost-line"><span>Setup cost</span><span class="amount">$0</span></div>
+      <div class="cost-line"><span>Extra entity fees</span><span class="amount">$0</span></div>
+      <div class="cost-line"><span>ABN / TFN</span><span class="amount">Already have</span></div>
+      <div class="cost-line"><span>ASIC fees</span><span class="amount">$0</span></div>
+      <div class="cost-line"><span>Tax return (rental schedule)</span><span class="amount" id="c_indivTax">$800/yr</span></div>
+      <div class="cost-line"><span>—</span><span class="amount">—</span></div>
+      <div class="cost-line"><span>Land tax (threshold benefit)</span><span class="amount" id="c_indivLandTax">likely $0</span></div>
+      <div class="cost-total"><span>Year 1 total (est.)</span><span id="c_indivY1">—</span></div>
+      <div class="cost-total"><span>Ongoing per year (est.)</span><span id="c_indivOngoing">—</span></div>
+    </div>
+  </div>
+
+  <div class="callout" id="costCallout">
+    <strong>Net cost of the trust structure</strong>
+    <span id="costDiff">—</span>
+  </div>
+</div>
+
+<!-- SCENARIOS TAB -->
+<div class="tab-content" id="tab-scenarios">
+
+  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Click a scenario to see the recommendation.</p>
+
+  <div class="scenario-grid">
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>Young couple, first investment property</h3>
+      <p>Both on PAYG income. High LVR needed. Property likely negatively geared for 3-5 years.</p>
+      <span class="rec rec-individual">Individual names recommended</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Negative gearing benefits are immediate and meaningful on PAYG income. Trust setup costs aren't justified for one property. Simpler lending. Revisit when portfolio reaches 2-3 properties and cashflow turns positive.
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>Growing portfolio (3-5 properties), one high earner</h3>
+      <p>Portfolio transitioning to cashflow-positive. Income disparity between partners. Long-term hold strategy.</p>
+      <span class="rec rec-trust">Trust recommended</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Income distribution flexibility becomes very valuable with income disparity. Asset protection scales with portfolio size. Land tax surcharge is a cost but is offset by tax savings from income splitting. The negative gearing loss is minimal once properties are cashflow-neutral or positive.
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>Business owners with liability exposure</h3>
+      <p>One or both partners run a business. Potential for litigation or creditor claims. Properties are wealth preservation.</p>
+      <span class="rec rec-trust">Trust strongly recommended</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Asset protection is the primary driver. A properly structured discretionary trust with a corporate trustee provides the strongest barrier between business liabilities and the property portfolio. This alone can justify the ongoing costs.
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>Older couple, estate planning focus</h3>
+      <p>Properties are the main wealth asset. Concerned about smooth transfer to children. Want to avoid probate.</p>
+      <span class="rec rec-trust">Trust recommended</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Trust assets don't go through probate — no delays, no public record, no estate challenges. Appointor/guardian roles transfer smoothly. Can bring children in as beneficiaries gradually. No stamp duty on change of beneficiary. Watch the vesting date — ensure it extends far enough.
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>Couple with adult children earning low income</h3>
+      <p>Children are students, starting careers, or at home. Parents want to minimise family tax bill.</p>
+      <span class="rec rec-trust">Trust recommended</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Distributing rental income and capital gains to low-income adult children (18+) is the classic trust play. Must be genuine — child is a beneficiary, receives real distribution, must declare it. Section 100A risk if parents retain the cash and child "lends" it back.
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="toggleDetail(this)">
+      <h3>High-growth area, plan to sell within 5 years</h3>
+      <p>Buy-renovate-sell strategy. Capital gains are the primary return. Multiple flips planned.</p>
+      <span class="rec rec-depends">Depends on income levels</span>
+      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
+        Trust lets you direct capital gains to the lowest-taxed beneficiary at sale time — massive advantage. But if held <12 months, no 50% discount for anyone. ATO may also treat frequent flips as business income (no CGT discount, assessed as ordinary income) — trust won't help with that classification. Get advice on the revenue vs capital account distinction.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DECISION MATRIX TAB -->
+<div class="tab-content" id="tab-matrix">
+
+  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Quick visual — green = advantage, red = disadvantage, amber = conditional.</p>
+
+  <div class="matrix-header">
+    <span></span>
+    <span>Trust</span>
+    <span>Individual</span>
+  </div>
+
+  <div class="matrix-row">
+    <div class="matrix-label">Asset Protection</div>
+    <div class="matrix-cell cell-green">Strong</div>
+    <div class="matrix-cell cell-red">Exposed</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Income Splitting</div>
+    <div class="matrix-cell cell-green">Flexible annually</div>
+    <div class="matrix-cell cell-red">Fixed by ownership</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Negative Gearing</div>
+    <div class="matrix-cell cell-red">Losses trapped</div>
+    <div class="matrix-cell cell-green">Offset salary</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Land Tax</div>
+    <div class="matrix-cell cell-red">Surcharge / no threshold</div>
+    <div class="matrix-cell cell-green">Threshold per person</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">CGT Discount</div>
+    <div class="matrix-cell cell-green">50% via beneficiaries</div>
+    <div class="matrix-cell cell-green">50% direct</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">CGT — Choose Recipient</div>
+    <div class="matrix-cell cell-green">Yes — any beneficiary</div>
+    <div class="matrix-cell cell-red">No — per ownership</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Estate / Succession</div>
+    <div class="matrix-cell cell-green">No probate</div>
+    <div class="matrix-cell cell-amber">Through estate</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Lending Access</div>
+    <div class="matrix-cell cell-amber">More restrictive</div>
+    <div class="matrix-cell cell-green">Standard resi</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Setup Cost</div>
+    <div class="matrix-cell cell-red">$2.5k–$5k</div>
+    <div class="matrix-cell cell-green">$0</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Ongoing Admin</div>
+    <div class="matrix-cell cell-amber">~$2.3k/yr</div>
+    <div class="matrix-cell cell-green">Minimal extra</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">Privacy</div>
+    <div class="matrix-cell cell-green">Company on title</div>
+    <div class="matrix-cell cell-red">Names on title</div>
+  </div>
+  <div class="matrix-row">
+    <div class="matrix-label">PPOR Exemption</div>
+    <div class="matrix-cell cell-red">Not available</div>
+    <div class="matrix-cell cell-green">Full exemption</div>
+  </div>
+
+  <div class="callout" style="margin-top:24px;">
+    <strong>Bottom line for most multi-property couples</strong>
+    Start in personal names for the first 1–2 negatively geared properties. Once the portfolio turns cashflow-positive (or you have adult children to distribute to), establish a trust for new acquisitions. Transferring existing properties into a trust triggers stamp duty + CGT — so plan the structure before you buy, not after.
+  </div>
+</div>
+
+<footer>
+  General information only — not legal, tax, or financial advice. Consult a qualified tax accountant and solicitor before structuring a property portfolio.
+  <br>Rates and thresholds are approximate (2024-25 FY) and vary by state. Generated May 2026.
+</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'costs') updateCosts();
+}
+
+function toggleDetail(card) {
+  const d = card.querySelector('.scenario-detail');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateCosts() {
+  const n = parseInt(document.getElementById('propCount').value);
+  const v = parseInt(document.getElementById('propValue').value);
+  const y = parseFloat(document.getElementById('rentalYield').value);
+
+  document.getElementById('propCountVal').textContent = n;
+  document.getElementById('propValueVal').textContent = '$' + v + 'k';
+  document.getElementById('rentalYieldVal').textContent = y.toFixed(1) + '%';
+
+  const totalLandValue = n * v * 1000 * 0.5; // rough land component
+  const deedCost = 2500;
+  const companyCost = 1200;
+  const asicAnnual = 310;
+  const trustTaxReturn = 1000 + (n * 200);
+  const companyTaxReturn = 500;
+
+  document.getElementById('c_taxReturn').textContent = '$' + trustTaxReturn.toLocaleString() + '/yr';
+
+  // Land tax estimate (NSW-style rough calc)
+  let trustLandTax = 0;
+  let indivLandTax = 0;
+  const nswThreshold = 1075000;
+
+  if (totalLandValue > 100) {
+    trustLandTax = Math.max(0, (totalLandValue - 100) * 0.016 + 100);
+    trustLandTax += totalLandValue * 0.02; // surcharge
+  }
+  if (totalLandValue > nswThreshold * 2) {
+    indivLandTax = Math.max(0, (totalLandValue / 2 - nswThreshold) * 0.016 + 100) * 2;
+  }
+
+  document.getElementById('c_landTax').textContent = trustLandTax > 0 ? '$' + Math.round(trustLandTax).toLocaleString() + '/yr' : '$0';
+  document.getElementById('c_indivLandTax').textContent = indivLandTax > 0 ? '$' + Math.round(indivLandTax).toLocaleString() + '/yr' : 'likely $0';
+
+  const trustY1 = deedCost + companyCost + asicAnnual + trustTaxReturn + companyTaxReturn + trustLandTax;
+  const trustOngoing = asicAnnual + trustTaxReturn + companyTaxReturn + trustLandTax;
+  const indivY1 = 800 + indivLandTax;
+  const indivOngoing = 800 + indivLandTax;
+
+  document.getElementById('c_trustY1').textContent = '$' + Math.round(trustY1).toLocaleString();
+  document.getElementById('c_trustOngoing').textContent = '$' + Math.round(trustOngoing).toLocaleString();
+  document.getElementById('c_indivY1').textContent = '$' + Math.round(indivY1).toLocaleString();
+  document.getElementById('c_indivOngoing').textContent = '$' + Math.round(indivOngoing).toLocaleString();
+
+  const diff = trustOngoing - indivOngoing;
+  const grossRent = n * v * 1000 * (y / 100);
+  document.getElementById('costDiff').textContent =
+    'The trust adds ~$' + Math.round(diff).toLocaleString() + '/yr in structural costs against $' +
+    Math.round(grossRent).toLocaleString() + '/yr gross rent. ' +
+    (diff < grossRent * 0.05 ? 'That\'s under 5% of gross rent — easily justified if tax savings exceed this.' :
+     'That\'s ' + (diff / grossRent * 100).toFixed(1) + '% of gross rent — weigh carefully against tax distribution savings.');
+
+  document.getElementById('c_indivTax').textContent = '$' + (400 + n * 200).toLocaleString() + '/yr';
+}
+
+updateCosts();
+</script>
+
+</body>
+</html>
