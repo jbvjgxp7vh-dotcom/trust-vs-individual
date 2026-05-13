@@ -478,7 +478,42 @@ const DISC_COLORS = {structural:'#6c8cff',mep:'#4ade80',architectural:'#a78bfa',
 let state = loadState();
 
 function defaultState() {
-  return { people: [], projects: [], allocations: {} };
+  const p1='s1',p2='s2',p3='s3',p4='s4',p5='s5',p6='s6',p7='s7',p8='s8';
+  const j1='p1',j2='p2',j3='p3',j4='p4',j5='p5',j6='p6',j7='p7',j8='p8',j9='p9',j10='p10';
+  return {
+    people: [
+      {id:p1,name:'Nguyen Van Huy',discipline:'Structural',capacity:45},
+      {id:p2,name:'Tran Minh Duc',discipline:'Structural',capacity:45},
+      {id:p3,name:'Le Thi Mai',discipline:'MEP',capacity:40},
+      {id:p4,name:'Pham Quoc Bao',discipline:'MEP',capacity:40},
+      {id:p5,name:'Vo Thanh Tung',discipline:'Drafting',capacity:45},
+      {id:p6,name:'Dang Hoang Nam',discipline:'Drafting',capacity:45},
+      {id:p7,name:'Bui Duc Anh',discipline:'Coordination',capacity:40},
+      {id:p8,name:'Hoang Thi Lan',discipline:'Architectural',capacity:40},
+    ],
+    projects: [
+      {id:j1,name:'Crows Nest A',phase:'DD',priority:'Urgent',client:'NDY'},
+      {id:j2,name:'Macquarie Park',phase:'CD',priority:'High',client:''},
+      {id:j3,name:'Parramatta Tower',phase:'SD',priority:'Normal',client:''},
+      {id:j4,name:'Chatswood Resi',phase:'DD',priority:'Normal',client:''},
+      {id:j5,name:'Burwood Mixed Use',phase:'CD',priority:'High',client:''},
+      {id:j6,name:'Epping Station',phase:'DD',priority:'Normal',client:''},
+      {id:j7,name:'Rhodes Waterfront',phase:'SD',priority:'Normal',client:''},
+      {id:j8,name:'Mascot Central',phase:'CA',priority:'Normal',client:''},
+      {id:j9,name:'Zetland Resi',phase:'DD',priority:'High',client:''},
+      {id:j10,name:'Liverpool Civic',phase:'Concept',priority:'Normal',client:''},
+    ],
+    allocations: {
+      [p1+'__'+j1]:18,[p1+'__'+j2]:12,[p1+'__'+j5]:10,[p1+'__'+j9]:8,
+      [p2+'__'+j1]:10,[p2+'__'+j3]:15,[p2+'__'+j6]:12,[p2+'__'+j10]:8,
+      [p3+'__'+j1]:8,[p3+'__'+j4]:15,[p3+'__'+j5]:10,[p3+'__'+j9]:12,
+      [p4+'__'+j2]:10,[p4+'__'+j3]:8,[p4+'__'+j6]:12,[p4+'__'+j7]:10,
+      [p5+'__'+j1]:12,[p5+'__'+j2]:15,[p5+'__'+j4]:10,[p5+'__'+j8]:10,
+      [p6+'__'+j3]:10,[p6+'__'+j5]:15,[p6+'__'+j7]:10,[p6+'__'+j9]:12,
+      [p7+'__'+j1]:10,[p7+'__'+j2]:8,[p7+'__'+j5]:8,[p7+'__'+j6]:8,[p7+'__'+j9]:8,
+      [p8+'__'+j4]:12,[p8+'__'+j7]:10,[p8+'__'+j8]:8,[p8+'__'+j10]:10,
+    }
+  };
 }
 
 function loadState() {
