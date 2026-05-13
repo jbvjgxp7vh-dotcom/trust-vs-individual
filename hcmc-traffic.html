@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Why Ho Chi Minh City Traffic Is So Busy</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -11,209 +13,259 @@
     background: #0f172a;
     color: #e2e8f0;
     line-height: 1.7;
+    scroll-behavior: smooth;
   }
+
+  /* NAV */
+  .sticky-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1e293b;
+    display: flex; justify-content: center; gap: 8px;
+    padding: 12px 16px; flex-wrap: wrap;
+  }
+  .sticky-nav a {
+    color: #94a3b8; text-decoration: none; font-size: 0.82rem;
+    padding: 6px 14px; border-radius: 20px; border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .sticky-nav a:hover, .sticky-nav a.active {
+    color: #f97316; border-color: #f97316;
+  }
+
+  /* HERO */
   .hero {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #172554 100%);
-    padding: 80px 24px 60px;
-    text-align: center;
+    padding: 120px 24px 60px; text-align: center;
     border-bottom: 1px solid #334155;
   }
   .hero h1 {
-    font-size: 2.8rem;
-    font-weight: 800;
+    font-size: 2.8rem; font-weight: 800;
     background: linear-gradient(135deg, #f97316, #ef4444, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     margin-bottom: 16px;
   }
-  .hero p {
-    font-size: 1.15rem;
-    color: #94a3b8;
-    max-width: 640px;
-    margin: 0 auto;
-  }
+  .hero p { font-size: 1.15rem; color: #94a3b8; max-width: 640px; margin: 0 auto; }
+
+  /* ANIMATED STATS */
   .stats-bar {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    flex-wrap: wrap;
-    padding: 40px 24px;
-    background: #1e293b;
-    border-bottom: 1px solid #334155;
+    display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+    padding: 40px 24px; background: #1e293b; border-bottom: 1px solid #334155;
   }
-  .stat {
-    text-align: center;
-  }
-  .stat-number {
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #f97316;
-  }
+  .stat { text-align: center; cursor: default; }
+  .stat-number { font-size: 2.4rem; font-weight: 800; color: #f97316; }
   .stat-label {
-    font-size: 0.85rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 4px;
+    font-size: 0.85rem; color: #64748b; text-transform: uppercase;
+    letter-spacing: 1px; margin-top: 4px;
   }
-  .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 60px 24px;
+  .stat-detail {
+    font-size: 0.8rem; color: #475569; max-height: 0; overflow: hidden;
+    transition: max-height 0.3s, margin 0.3s; margin-top: 0;
   }
-  .section {
-    margin-bottom: 56px;
-  }
+  .stat:hover .stat-detail { max-height: 60px; margin-top: 8px; }
+
+  /* CONTAINER */
+  .container { max-width: 960px; margin: 0 auto; padding: 60px 24px; }
+  .section { margin-bottom: 56px; scroll-margin-top: 70px; }
   .section h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #f8fafc;
-    margin-bottom: 20px;
-    padding-left: 16px;
-    border-left: 4px solid #f97316;
+    font-size: 1.6rem; font-weight: 700; color: #f8fafc;
+    margin-bottom: 20px; padding-left: 16px; border-left: 4px solid #f97316;
   }
-  .section p {
-    color: #cbd5e1;
-    font-size: 1.05rem;
-    margin-bottom: 16px;
+  .section p { color: #cbd5e1; font-size: 1.05rem; margin-bottom: 16px; }
+
+  /* MAP */
+  .map-container {
+    border-radius: 12px; overflow: hidden; border: 1px solid #334155;
+    margin: 24px 0;
   }
+  #map { height: 480px; width: 100%; }
+  .map-legend {
+    background: #1e293b; padding: 16px; display: flex; gap: 24px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #94a3b8; }
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  }
+  .leaflet-popup-content-wrapper {
+    background: #1e293b !important; color: #e2e8f0 !important;
+    border: 1px solid #334155 !important; border-radius: 8px !important;
+  }
+  .leaflet-popup-tip { background: #1e293b !important; }
+  .leaflet-popup-content { font-size: 0.9rem; line-height: 1.5; }
+  .leaflet-popup-content strong { color: #f97316; }
+
+  /* INTERACTIVE CARDS */
   .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-top: 24px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px; margin-top: 24px;
   }
   .card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 28px;
-    transition: transform 0.2s, border-color 0.2s;
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 28px; transition: transform 0.2s, border-color 0.2s; cursor: pointer;
+    position: relative; overflow: hidden;
   }
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: #f97316;
+  .card:hover { transform: translateY(-4px); border-color: #f97316; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1.15rem; color: #f8fafc; margin-bottom: 8px; }
+  .card .card-summary { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; }
+  .card .card-detail {
+    color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease, margin 0.3s;
+    margin-top: 0;
   }
-  .card-icon {
-    font-size: 2rem;
-    margin-bottom: 12px;
+  .card.expanded .card-detail { max-height: 300px; margin-top: 12px; }
+  .card .expand-hint {
+    font-size: 0.75rem; color: #475569; margin-top: 12px;
+    transition: opacity 0.3s;
   }
-  .card h3 {
-    font-size: 1.15rem;
-    color: #f8fafc;
-    margin-bottom: 8px;
-  }
-  .card p {
-    color: #94a3b8;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-  .timeline {
-    position: relative;
-    padding-left: 32px;
-    margin-top: 24px;
-  }
+  .card.expanded .expand-hint { opacity: 0; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 32px; margin-top: 24px; }
   .timeline::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #334155;
+    content: ''; position: absolute; left: 8px; top: 0; bottom: 0;
+    width: 2px; background: #334155;
   }
   .timeline-item {
-    position: relative;
-    margin-bottom: 28px;
+    position: relative; margin-bottom: 28px; opacity: 0;
+    transform: translateX(-20px); transition: all 0.5s ease;
   }
+  .timeline-item.visible { opacity: 1; transform: translateX(0); }
   .timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -28px;
-    top: 8px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #f97316;
-    border: 2px solid #0f172a;
+    content: ''; position: absolute; left: -28px; top: 8px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #f97316; border: 2px solid #0f172a;
   }
   .timeline-item h4 {
-    color: #f97316;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    color: #f97316; font-size: 0.9rem; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 4px;
   }
-  .timeline-item p {
-    color: #94a3b8;
-    font-size: 0.95rem;
+  .timeline-item p { color: #94a3b8; font-size: 0.95rem; }
+
+  /* VEHICLE GROWTH CHART */
+  .chart-container {
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 32px; margin: 24px 0;
   }
+  .chart-title { color: #f8fafc; font-size: 1.1rem; margin-bottom: 20px; }
+  .bar-chart { display: flex; flex-direction: column; gap: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-year { color: #94a3b8; font-size: 0.85rem; min-width: 44px; text-align: right; }
+  .bar-track {
+    flex: 1; height: 28px; background: #0f172a; border-radius: 6px;
+    overflow: hidden; position: relative;
+  }
+  .bar-fill-moto {
+    height: 100%; background: linear-gradient(90deg, #f97316, #fb923c);
+    border-radius: 6px 0 0 6px; position: absolute; left: 0; top: 0;
+    width: 0; transition: width 1.5s ease;
+  }
+  .bar-fill-car {
+    height: 100%; background: linear-gradient(90deg, #ef4444, #f87171);
+    border-radius: 0 6px 6px 0; position: absolute; top: 0;
+    width: 0; transition: width 1.5s ease, left 1.5s ease;
+  }
+  .bar-label {
+    color: #64748b; font-size: 0.78rem; min-width: 80px; white-space: nowrap;
+  }
+
+  /* MODE SPLIT DONUT */
+  .donut-section {
+    display: flex; gap: 40px; align-items: center; justify-content: center;
+    flex-wrap: wrap; margin: 24px 0;
+  }
+  .donut-wrapper { position: relative; width: 220px; height: 220px; }
+  .donut-wrapper svg { transform: rotate(-90deg); }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-center .big { font-size: 2rem; font-weight: 800; color: #f97316; }
+  .donut-center .small { font-size: 0.8rem; color: #64748b; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .donut-legend-item {
+    display: flex; align-items: center; gap: 10px; color: #cbd5e1; font-size: 0.95rem;
+  }
+  .donut-legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* COMPARISON */
+  .comparison {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-top: 24px;
+  }
+  .comp-card {
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 24px; text-align: center; cursor: pointer;
+    transition: all 0.3s;
+  }
+  .comp-card:hover, .comp-card.active { border-color: #f97316; transform: scale(1.03); }
+  .comp-card h4 { color: #f97316; margin-bottom: 8px; font-size: 1rem; }
+  .comp-card .comp-metric { font-size: 2rem; font-weight: 800; color: #f8fafc; }
+  .comp-card .comp-unit { font-size: 0.8rem; color: #64748b; }
+  .comp-detail {
+    background: #172554; border: 1px solid #334155; border-radius: 12px;
+    padding: 24px; margin-top: 16px; display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .comp-detail.show { display: block; }
+  .comp-detail p { color: #94a3b8; font-size: 0.95rem; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HIGHLIGHT BOX */
   .highlight-box {
     background: linear-gradient(135deg, #1e293b, #172554);
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 32px;
-    margin-top: 24px;
+    border: 1px solid #334155; border-radius: 12px; padding: 32px; margin-top: 24px;
   }
-  .highlight-box h3 {
-    color: #f97316;
-    margin-bottom: 12px;
-    font-size: 1.2rem;
-  }
-  .highlight-box ul {
-    list-style: none;
-    padding: 0;
-  }
+  .highlight-box h3 { color: #f97316; margin-bottom: 12px; font-size: 1.2rem; }
+  .highlight-box ul { list-style: none; padding: 0; }
   .highlight-box li {
-    color: #cbd5e1;
-    padding: 8px 0;
-    padding-left: 24px;
-    position: relative;
-    font-size: 1rem;
+    color: #cbd5e1; padding: 8px 0; padding-left: 24px;
+    position: relative; font-size: 1rem;
   }
   .highlight-box li::before {
-    content: '>';
-    position: absolute;
-    left: 0;
-    color: #f97316;
-    font-weight: 700;
+    content: '>'; position: absolute; left: 0; color: #f97316; font-weight: 700;
   }
-  .comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 24px;
+
+  /* CULTURE TOGGLE */
+  .culture-tabs {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
   }
+  .culture-tab {
+    padding: 8px 20px; border-radius: 20px; border: 1px solid #334155;
+    background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .culture-tab.active { background: #f97316; color: #0f172a; border-color: #f97316; font-weight: 600; }
+  .culture-content { display: none; animation: fadeIn 0.3s ease; }
+  .culture-content.active { display: block; }
+
+  footer {
+    text-align: center; padding: 40px 24px; color: #475569;
+    font-size: 0.85rem; border-top: 1px solid #1e293b;
+  }
+
   @media (max-width: 600px) {
-    .comparison { grid-template-columns: 1fr; }
     .hero h1 { font-size: 2rem; }
     .stats-bar { gap: 24px; }
-  }
-  .comparison .col {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 24px;
-  }
-  .comparison .col h4 {
-    color: #f97316;
-    margin-bottom: 12px;
-    font-size: 1rem;
-  }
-  .comparison .col p {
-    color: #94a3b8;
-    font-size: 0.95rem;
-  }
-  footer {
-    text-align: center;
-    padding: 40px 24px;
-    color: #475569;
-    font-size: 0.85rem;
-    border-top: 1px solid #1e293b;
+    #map { height: 340px; }
+    .sticky-nav { gap: 4px; padding: 8px 12px; }
+    .sticky-nav a { font-size: 0.75rem; padding: 5px 10px; }
   }
 </style>
 </head>
 <body>
+
+<nav class="sticky-nav">
+  <a href="#map-section">Map</a>
+  <a href="#reasons">Why It's Busy</a>
+  <a href="#growth">Vehicle Growth</a>
+  <a href="#mode-split">Mode Split</a>
+  <a href="#history">History</a>
+  <a href="#culture">Culture</a>
+  <a href="#compare">Compare</a>
+  <a href="#solutions">Solutions</a>
+</nav>
 
 <div class="hero">
   <h1>Why Is HCMC Traffic So Chaotic?</h1>
@@ -222,141 +274,233 @@
 
 <div class="stats-bar">
   <div class="stat">
-    <div class="stat-number">10M+</div>
+    <div class="stat-number" data-target="10" data-suffix="M+">0</div>
     <div class="stat-label">Population</div>
+    <div class="stat-detail">Official 10M; estimated 13M+ including unregistered migrants</div>
   </div>
   <div class="stat">
-    <div class="stat-number">~9M</div>
+    <div class="stat-number" data-target="9" data-suffix="M">0</div>
     <div class="stat-label">Registered Motorbikes</div>
+    <div class="stat-detail">Roughly one motorbike per adult resident</div>
   </div>
   <div class="stat">
-    <div class="stat-number">1M+</div>
+    <div class="stat-number" data-target="1" data-suffix="M+">0</div>
     <div class="stat-label">Cars & Growing</div>
+    <div class="stat-detail">Growing 15-20% year-on-year since 2015</div>
   </div>
   <div class="stat">
-    <div class="stat-number">~2%</div>
+    <div class="stat-number" data-target="2" data-suffix="%">0</div>
     <div class="stat-label">Land Used for Roads</div>
+    <div class="stat-detail">Tokyo allocates 24%; Paris 25%</div>
   </div>
 </div>
 
 <div class="container">
 
-  <div class="section">
-    <h2>The Motorbike Explosion</h2>
-    <p>Vietnam's economic liberalisation (Doi Moi, 1986) unleashed a consumer revolution. The motorbike became the universal vehicle: affordable, practical, and perfectly suited to narrow alleys and tropical rain. By the 2020s, HCMC had roughly one motorbike for every adult resident.</p>
-    <p>Unlike cities that transitioned from bicycles to cars with mass transit in between, HCMC skipped that step entirely. The result is a road network designed for bicycles and cyclos, now carrying millions of high-speed two-wheelers.</p>
-  </div>
-
-  <div class="section">
-    <h2>Core Reasons for the Congestion</h2>
-    <div class="cards">
-      <div class="card">
-        <div class="card-icon">🏗️</div>
-        <h3>Roads Can't Keep Up</h3>
-        <p>Only about 2% of HCMC's land is allocated to roads, compared to 20-25% in cities like Tokyo or Paris. Road construction lags far behind population and vehicle growth.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🚇</div>
-        <h3>No Metro (Until Now)</h3>
-        <p>Metro Line 1 (Ben Thanh to Suoi Tien) has been under construction since 2012. Without rail, every trip is surface-level, adding to road demand. Line 1 is expected to finally open in late 2024-2025.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🌊</div>
-        <h3>Flooding & Geography</h3>
-        <p>Built on a river delta barely above sea level, HCMC floods regularly during monsoon season. Flooded roads reduce capacity to a crawl and funnel traffic into fewer corridors.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🏘️</div>
-        <h3>Urban Sprawl Without Density Planning</h3>
-        <p>Rapid development pushed housing outward while jobs stayed central. Workers commute long distances on surface roads because there's no express transit connecting outer districts to the core.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🚗</div>
-        <h3>Car Ownership Rising Fast</h3>
-        <p>As incomes rise, families upgrade from motorbikes to cars. Cars take 4-6x more road space per person. Even a modest shift in mode share dramatically worsens congestion on roads already at capacity.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🛑</div>
-        <h3>Weak Traffic Management</h3>
-        <p>Signal timing is often manual or poorly optimised. Lane discipline is loosely enforced. Motorbikes, cars, buses, trucks, and pedestrians share the same space with minimal separation.</p>
+  <!-- MAP -->
+  <div class="section" id="map-section">
+    <h2>Congestion Hotspots</h2>
+    <p>Tap any marker to learn why that area is a bottleneck. Zoom and pan to explore.</p>
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Severe congestion</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div> Major bottleneck</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> Flood-prone</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Metro Line 1 (under construction)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Key infrastructure</div>
       </div>
     </div>
   </div>
 
-  <div class="section">
+  <!-- REASONS -->
+  <div class="section" id="reasons">
+    <h2>Core Reasons for the Congestion</h2>
+    <p>Click any card to learn more.</p>
+    <div class="cards">
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🏗️</div>
+        <h3>Roads Can't Keep Up</h3>
+        <p class="card-summary">Only ~2% of HCMC's land is roads, vs 20-25% in Tokyo or Paris.</p>
+        <div class="card-detail">The city's French-colonial street grid was designed for 1.5 million people on bicycles and cyclos. Today's 10M+ population overwhelms corridors that haven't widened since the 1960s. New road projects average 10-15 years from approval to completion due to land acquisition challenges.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🚇</div>
+        <h3>No Metro (Until Now)</h3>
+        <p class="card-summary">Metro Line 1 has been under construction since 2012. Without rail, every trip is on the road.</p>
+        <div class="card-detail">Originally due in 2018, Line 1 connects Ben Thanh Market to Suoi Tien (19.7 km, 14 stations). Cost overruns pushed the budget from $1.1B to $2.7B. Without it, the city has zero high-capacity rapid transit, forcing all 26M+ daily trips onto surface roads.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🌊</div>
+        <h3>Flooding & Geography</h3>
+        <p class="card-summary">River delta, barely above sea level. Monsoon floods cut road capacity in half.</p>
+        <div class="card-detail">HCMC sits just 0.5-1.5m above sea level. Climate change and upstream dam operations have intensified tidal flooding. Nguyen Huu Canh Street near Saigon River floods almost weekly during rainy season, creating cascading gridlock across Binh Thanh and District 1.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🏘️</div>
+        <h3>Sprawl Without Transit</h3>
+        <p class="card-summary">Housing pushed outward but jobs stayed central. No express transit to connect them.</p>
+        <div class="card-detail">Districts like Binh Chanh, Hoc Mon, and Cu Chi grew 5-8% annually as affordable housing moved outward. But employment remains concentrated in Districts 1, 3, and Thu Duc. Workers commute 15-25 km each way on two-lane roads never designed for that volume.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🚗</div>
+        <h3>Car Ownership Rising Fast</h3>
+        <p class="card-summary">Cars take 4-6x more road space per person. Even modest mode shift worsens gridlock.</p>
+        <div class="card-detail">Vietnam's middle class is the fastest-growing in SE Asia. Car registrations in HCMC grew ~18% annually from 2015-2023. A single car replacing 3 motorbikes actually uses more road space. The road network literally cannot absorb this transition without mass transit alternatives.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+      <div class="card" onclick="this.classList.toggle('expanded')">
+        <div class="card-icon">🛑</div>
+        <h3>Weak Traffic Management</h3>
+        <p class="card-summary">Manual signals, loose enforcement. Motorbikes, cars, and trucks all share the same lanes.</p>
+        <div class="card-detail">Only ~30% of intersections have adaptive signal timing. Lane markings are treated as suggestions. Right-of-way defaults to whoever is bigger or faster. Bus lanes exist on paper but are routinely blocked by parked motorbikes. Enforcement cameras are increasing but coverage remains thin.</div>
+        <div class="expand-hint">tap to expand</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEHICLE GROWTH CHART -->
+  <div class="section" id="growth">
+    <h2>Vehicle Growth Over Time</h2>
+    <p>Motorbikes dominate, but car registrations are accelerating fast.</p>
+    <div class="chart-container" id="vehicle-chart">
+      <div class="chart-title">Registered Vehicles in HCMC (millions)</div>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+  </div>
+
+  <!-- MODE SPLIT -->
+  <div class="section" id="mode-split">
+    <h2>How People Get Around</h2>
+    <div class="donut-section" id="donut-section">
+      <div class="donut-wrapper">
+        <svg viewBox="0 0 200 200" width="220" height="220">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#1e293b" stroke-width="24"/>
+          <circle class="donut-seg" cx="100" cy="100" r="80" fill="none" stroke="#f97316" stroke-width="24"
+            stroke-dasharray="0 502.65" data-target="377" stroke-linecap="round"/>
+          <circle class="donut-seg" cx="100" cy="100" r="80" fill="none" stroke="#ef4444" stroke-width="24"
+            stroke-dasharray="0 502.65" data-target="60.3" data-offset="377" stroke-linecap="round"/>
+          <circle class="donut-seg" cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="24"
+            stroke-dasharray="0 502.65" data-target="40.2" data-offset="437.3" stroke-linecap="round"/>
+          <circle class="donut-seg" cx="100" cy="100" r="80" fill="none" stroke="#8b5cf6" stroke-width="24"
+            stroke-dasharray="0 502.65" data-target="25.2" data-offset="477.5" stroke-linecap="round"/>
+        </svg>
+        <div class="donut-center">
+          <div class="big">26M</div>
+          <div class="small">daily trips</div>
+        </div>
+      </div>
+      <div class="donut-legend">
+        <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#f97316"></div> Motorbike — 75%</div>
+        <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#ef4444"></div> Car / Taxi — 12%</div>
+        <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#3b82f6"></div> Bus — 8%</div>
+        <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#8b5cf6"></div> Walk / Cycle / Other — 5%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="section" id="history">
     <h2>How It Got Here</h2>
     <div class="timeline">
       <div class="timeline-item">
         <h4>Pre-1975</h4>
-        <p>Saigon's French colonial grid served a much smaller population. Wide boulevards like Nguyen Hue and Le Loi were built for a city of ~1.5 million.</p>
+        <p>Saigon's French colonial grid served ~1.5 million. Wide boulevards like Nguyen Hue were built for pedestrians and cyclos.</p>
       </div>
       <div class="timeline-item">
         <h4>1986 — Doi Moi</h4>
-        <p>Economic reforms opened markets. Honda, Yamaha, and local manufacturers flooded the country with affordable motorbikes. Personal mobility exploded overnight.</p>
+        <p>Economic reforms opened markets. Honda, Yamaha, and local brands flooded the country with affordable motorbikes. Personal mobility exploded.</p>
       </div>
       <div class="timeline-item">
         <h4>2000s — Construction Boom</h4>
-        <p>High-rise apartments and commercial towers multiplied without proportional road or transit investment. Population density surged in Districts 1, 3, Binh Thanh, and Thu Duc.</p>
+        <p>High-rises multiplied without proportional road or transit investment. Population density surged in Districts 1, 3, Binh Thanh, and Thu Duc.</p>
       </div>
       <div class="timeline-item">
         <h4>2010s — Car Growth Begins</h4>
-        <p>Vietnam's growing middle class started buying cars. Registration numbers climbed 15-20% year on year. Roads built for motorbike flow couldn't absorb the larger vehicles.</p>
+        <p>Vietnam's growing middle class started buying cars. Registrations climbed 15-20% per year. Roads built for motorbikes couldn't absorb larger vehicles.</p>
       </div>
       <div class="timeline-item">
         <h4>2020s — Metro Delayed, Ride-Hail Adds Volume</h4>
-        <p>Grab and other ride-hail platforms added millions of trips (especially car trips) to the network. Metro Line 1 missed deadline after deadline. Thu Duc City merger created a mega-district with no matching transit spine.</p>
+        <p>Grab added millions of car trips. Metro Line 1 missed deadline after deadline. Thu Duc City merger created a mega-district with no transit spine.</p>
       </div>
     </div>
   </div>
 
-  <div class="section">
+  <!-- CULTURE -->
+  <div class="section" id="culture">
     <h2>The Cultural Factor</h2>
-    <p>Traffic in HCMC isn't just an infrastructure problem; it's deeply cultural. The motorbike is more than transport: it's a mobile shop counter, a family vehicle (three or four riders is normal), and a social space. Vietnamese traffic operates on a negotiation model rather than a rules model. Riders continuously signal intent through micro-movements, horn taps, and eye contact.</p>
-    <p>This system is remarkably efficient at low speeds. Intersections that look like pure chaos actually self-organise through thousands of individual negotiations per minute. But it breaks down when cars enter the mix, because cars can't negotiate the same way: they're too large, too enclosed, and too rigid in their lane requirements.</p>
+    <div class="culture-tabs">
+      <button class="culture-tab active" data-tab="negotiation">Negotiation Model</button>
+      <button class="culture-tab" data-tab="motorbike-life">Motorbike as Life</button>
+      <button class="culture-tab" data-tab="car-clash">Car vs Moto Clash</button>
+    </div>
+    <div class="culture-content active" id="tab-negotiation">
+      <p>Vietnamese traffic operates on a negotiation model, not a rules model. Riders signal intent through micro-movements, horn taps, and eye contact. Intersections that look like pure chaos actually self-organise through thousands of individual negotiations per minute.</p>
+      <p>This system is remarkably efficient at low speeds — often more throughput per lane than signalised intersections in Western cities.</p>
+    </div>
+    <div class="culture-content" id="tab-motorbike-life">
+      <p>The motorbike isn't just transport. It's a mobile shop counter, a family vehicle (3-4 riders is normal), a delivery truck, and a social space. Vietnamese cities were literally redesigned around the motorbike — narrow alleys (hems) that only a two-wheeler can navigate form entire neighbourhoods.</p>
+      <p>Proposing to ban motorbikes is like proposing to ban walking — it would disconnect millions from daily life.</p>
+    </div>
+    <div class="culture-content" id="tab-car-clash">
+      <p>The negotiation system breaks down when cars enter the mix. Cars are too large, too enclosed, and too rigid in their lane requirements to participate in the micro-negotiation dance. A single car disrupts the flow that dozens of motorbikes maintained smoothly.</p>
+      <p>This is the core tension: rising incomes push people toward cars, but every car makes the system worse for everyone, including the driver.</p>
+    </div>
   </div>
 
-  <div class="section">
+  <!-- COMPARISON -->
+  <div class="section" id="compare">
     <h2>HCMC vs Other Asian Megacities</h2>
-    <div class="comparison">
-      <div class="col">
+    <p>Click a city to see details.</p>
+    <div class="comparison" id="city-comparison">
+      <div class="comp-card active" data-city="hcmc">
         <h4>HCMC</h4>
-        <p><strong>Road share:</strong> ~2% of land<br>
-        <strong>Metro lines:</strong> 0 operational (Line 1 imminent)<br>
-        <strong>Primary mode:</strong> Motorbike (~80%)<br>
-        <strong>Peak speed:</strong> 10-15 km/h in centre</p>
+        <div class="comp-metric">2%</div>
+        <div class="comp-unit">road share of land</div>
       </div>
-      <div class="col">
+      <div class="comp-card" data-city="bangkok">
         <h4>Bangkok</h4>
-        <p><strong>Road share:</strong> ~11% of land<br>
-        <strong>Metro lines:</strong> 5+ (BTS, MRT, ARL)<br>
-        <strong>Primary mode:</strong> Mixed car/transit<br>
-        <strong>Peak speed:</strong> 15-20 km/h in centre</p>
+        <div class="comp-metric">11%</div>
+        <div class="comp-unit">road share of land</div>
+      </div>
+      <div class="comp-card" data-city="jakarta">
+        <h4>Jakarta</h4>
+        <div class="comp-metric">6%</div>
+        <div class="comp-unit">road share of land</div>
+      </div>
+      <div class="comp-card" data-city="tokyo">
+        <h4>Tokyo</h4>
+        <div class="comp-metric">24%</div>
+        <div class="comp-unit">road share of land</div>
       </div>
     </div>
-    <div class="comparison" style="margin-top: 16px;">
-      <div class="col">
-        <h4>Jakarta</h4>
-        <p><strong>Road share:</strong> ~6% of land<br>
-        <strong>Metro lines:</strong> 1 MRT + commuter rail<br>
-        <strong>Primary mode:</strong> Car/motorbike mix<br>
-        <strong>Peak speed:</strong> 5-10 km/h in centre</p>
+    <div id="city-details">
+      <div class="comp-detail show" data-city="hcmc">
+        <p><strong style="color:#f97316">Ho Chi Minh City:</strong> 0 metro lines operational. Primary mode: motorbike (~75%). Peak centre speed: 10-15 km/h. Population density: ~4,300/km&sup2;. The city with the least road infrastructure and the most vehicles per capita in this comparison.</p>
       </div>
-      <div class="col">
-        <h4>Tokyo</h4>
-        <p><strong>Road share:</strong> ~24% of land<br>
-        <strong>Metro lines:</strong> 13 + extensive rail<br>
-        <strong>Primary mode:</strong> Rail (~60%)<br>
-        <strong>Peak speed:</strong> 25-30 km/h in centre</p>
+      <div class="comp-detail" data-city="bangkok">
+        <p><strong style="color:#f97316">Bangkok:</strong> 5+ rail lines (BTS, MRT, ARL). Mixed car/transit mode split. Peak centre speed: 15-20 km/h. Road share 5x higher than HCMC but still heavily congested due to car dominance and sprawl. Rail investment since 1999 has eased some corridors.</p>
+      </div>
+      <div class="comp-detail" data-city="jakarta">
+        <p><strong style="color:#f97316">Jakarta:</strong> 1 MRT line + commuter rail. Car/motorbike mix. Peak centre speed: 5-10 km/h — often worse than HCMC. Similar low road-share problem. TransJakarta BRT carries 1M+ daily but can't offset car growth.</p>
+      </div>
+      <div class="comp-detail" data-city="tokyo">
+        <p><strong style="color:#f97316">Tokyo:</strong> 13 metro lines + extensive JR/private rail. Rail carries ~60% of commuters. Peak centre speed: 25-30 km/h. The benchmark: 24% road share + world-class transit = a functional megacity. HCMC needs 50 years of this kind of investment.</p>
       </div>
     </div>
   </div>
 
-  <div class="section">
+  <!-- SOLUTIONS -->
+  <div class="section" id="solutions">
     <h2>What's Being Done</h2>
     <div class="highlight-box">
       <h3>Current & Planned Interventions</h3>
       <ul>
-        <li>Metro Line 1 (Ben Thanh — Suoi Tien): 19.7 km, 14 stations, finally nearing completion</li>
+        <li>Metro Line 1 (Ben Thanh — Suoi Tien): 19.7 km, 14 stations, nearing completion</li>
         <li>Metro Line 2 (Ben Thanh — Tham Luong): approved, construction underway</li>
         <li>BRT Line 1 along Vo Van Kiet — Pham Hung corridor</li>
         <li>Motorbike ban proposed for central districts by 2030</li>
@@ -365,14 +509,171 @@
         <li>Thu Duc City transit-oriented development plans</li>
       </ul>
     </div>
-    <p style="margin-top: 20px;">The fundamental challenge remains: HCMC needs to build 50 years of transit infrastructure while the city continues to grow at 3% per year. Every year of delay means more vehicles on roads that were never built for this volume.</p>
+    <p style="margin-top: 20px;">The fundamental challenge: HCMC needs to build 50 years of transit infrastructure while the city continues to grow at 3% per year. Every year of delay means more vehicles on roads that were never built for this volume.</p>
   </div>
 
 </div>
 
-<footer>
-  HCMC Traffic Explainer &mdash; May 2026
-</footer>
+<footer>HCMC Traffic Explainer &mdash; May 2026</footer>
+
+<script>
+// --- MAP ---
+const map = L.map('map', { scrollWheelZoom: false }).setView([10.78, 106.695], 13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 18
+}).addTo(map);
+
+const hotspots = [
+  { lat: 10.7731, lng: 106.6980, color: '#ef4444', title: 'Ben Thanh Roundabout',
+    desc: 'The city\'s most iconic intersection. 6 major roads converge with no grade separation. Metro Line 1 construction has reduced lanes for over a decade.' },
+  { lat: 10.8024, lng: 106.7146, color: '#ef4444', title: 'Hang Xanh Intersection',
+    desc: 'Flyover helps but ground-level is still gridlocked. Binh Thanh commuters funnel through here to reach District 1. Peak delays: 30-45 min.' },
+  { lat: 10.7628, lng: 106.6820, color: '#ef4444', title: 'Nguyen Van Linh — District 7',
+    desc: 'Phu My Hung satellite city generates massive car traffic on a single arterial. No rail alternative. Bridge bottlenecks at Kenh Te.' },
+  { lat: 10.7898, lng: 106.6890, color: '#f97316', title: 'Cong Hoa — Tan Binh',
+    desc: 'Airport road. Trucks, taxis, motorbikes, and buses compete for 4 lanes. Hoang Van Thu intersection is a daily chokepoint.' },
+  { lat: 10.8150, lng: 106.7630, color: '#f97316', title: 'Thu Duc / Xa Lo Ha Noi',
+    desc: 'The eastern gateway. National Highway 1 traffic merges with local Thu Duc commuters. Container trucks from Cat Lai port worsen the mix.' },
+  { lat: 10.7550, lng: 106.6910, color: '#eab308', title: 'Nguyen Huu Canh — Binh Thanh',
+    desc: 'Notorious flood zone. Street sits below Saigon River high-tide level. Floods weekly in rainy season, cutting a key District 1 approach.' },
+  { lat: 10.7420, lng: 106.7100, color: '#eab308', title: 'District 4 — Low-Lying',
+    desc: 'Entire district is flood-prone. When tides combine with rain, roads become canals. Traffic diverts to already-saturated bridges.' },
+  { lat: 10.7928, lng: 106.7419, color: '#22c55e', title: 'Metro Line 1 — Ba Son Station',
+    desc: 'Underground station nearing completion. Will connect the dense Binh Thanh/D1 corridor to Thu Duc. Expected to carry 186,000 passengers/day.' },
+  { lat: 10.8550, lng: 106.8020, color: '#22c55e', title: 'Metro Line 1 — Suoi Tien Terminal',
+    desc: 'Eastern terminus near the amusement park. Park-and-ride planned to intercept motorbike commuters before they enter the city core.' },
+  { lat: 10.8184, lng: 106.6590, color: '#3b82f6', title: 'Tan Son Nhat Airport',
+    desc: 'Vietnam\'s busiest airport, surrounded by residential areas. Single access road (Truong Son). New terminal T3 under construction. Long Thanh airport planned to relieve pressure.' },
+];
+
+hotspots.forEach(h => {
+  L.circleMarker([h.lat, h.lng], {
+    radius: 10, fillColor: h.color, color: '#0f172a', weight: 2,
+    fillOpacity: 0.85
+  }).addTo(map).bindPopup(`<strong>${h.title}</strong><br>${h.desc}`, { maxWidth: 280 });
+});
+
+// Metro Line 1 route (approximate)
+const metroLine = [
+  [10.7731, 106.6980], [10.7850, 106.7100], [10.7928, 106.7419],
+  [10.8100, 106.7550], [10.8300, 106.7750], [10.8550, 106.8020]
+];
+L.polyline(metroLine, { color: '#22c55e', weight: 3, dashArray: '8,8', opacity: 0.7 }).addTo(map);
+
+// --- ANIMATED COUNTERS ---
+const statObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    let current = 0;
+    const step = target / 40;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = (Number.isInteger(target) ? Math.round(current) : current.toFixed(0)) + suffix;
+    }, 30);
+    statObserver.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-number').forEach(el => statObserver.observe(el));
+
+// --- VEHICLE GROWTH BAR CHART ---
+const vehicleData = [
+  { year: '2000', moto: 2.2, car: 0.15 },
+  { year: '2005', moto: 3.5, car: 0.25 },
+  { year: '2010', moto: 5.2, car: 0.38 },
+  { year: '2015', moto: 7.0, car: 0.55 },
+  { year: '2020', moto: 8.5, car: 0.82 },
+  { year: '2025', moto: 9.0, car: 1.10 },
+];
+const maxVehicle = 11;
+const barChart = document.getElementById('bar-chart');
+vehicleData.forEach(d => {
+  const motoW = (d.moto / maxVehicle) * 100;
+  const carW = (d.car / maxVehicle) * 100;
+  barChart.innerHTML += `
+    <div class="bar-row">
+      <div class="bar-year">${d.year}</div>
+      <div class="bar-track">
+        <div class="bar-fill-moto" data-width="${motoW}"></div>
+        <div class="bar-fill-car" data-width="${carW}" data-left="${motoW}"></div>
+      </div>
+      <div class="bar-label">${d.moto}M moto / ${d.car}M car</div>
+    </div>`;
+});
+const chartObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    document.querySelectorAll('.bar-fill-moto').forEach(b => b.style.width = b.dataset.width + '%');
+    document.querySelectorAll('.bar-fill-car').forEach(b => {
+      b.style.width = b.dataset.width + '%';
+      b.style.left = b.dataset.left + '%';
+    });
+    chartObserver.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+chartObserver.observe(document.getElementById('vehicle-chart'));
+
+// --- DONUT ANIMATION ---
+const donutObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    document.querySelectorAll('.donut-seg').forEach(seg => {
+      const target = parseFloat(seg.dataset.target);
+      const offset = parseFloat(seg.dataset.offset || 0);
+      seg.style.transition = 'stroke-dasharray 1.2s ease';
+      seg.style.strokeDashoffset = -offset;
+      seg.setAttribute('stroke-dasharray', `${target} ${502.65 - target}`);
+    });
+    donutObserver.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+donutObserver.observe(document.getElementById('donut-section'));
+
+// --- TIMELINE ANIMATION ---
+const timelineObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.timeline-item').forEach(el => timelineObserver.observe(el));
+
+// --- CULTURE TABS ---
+document.querySelectorAll('.culture-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.culture-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.culture-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// --- CITY COMPARISON ---
+document.querySelectorAll('.comp-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.comp-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.comp-detail').forEach(d => d.classList.remove('show'));
+    card.classList.add('active');
+    document.querySelector(`.comp-detail[data-city="${card.dataset.city}"]`).classList.add('show');
+  });
+});
+
+// --- STICKY NAV ACTIVE STATE ---
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.sticky-nav a');
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`.sticky-nav a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
+sections.forEach(s => navObserver.observe(s));
+</script>
 
 </body>
 </html>
