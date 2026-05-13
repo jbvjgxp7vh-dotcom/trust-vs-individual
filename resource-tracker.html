@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indochine Engineering — Resource Tracker</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #242836;
+    --border: #2e3345;
+    --text: #e4e7f0;
+    --text-dim: #8b90a5;
+    --accent: #6c8cff;
+    --accent-dim: #3d5199;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --orange: #fb923c;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  header h1 span { color: var(--accent); }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  button:hover { background: var(--accent-dim); border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { background: #5a7aee; }
+  button.danger { color: var(--red); }
+  button.danger:hover { background: rgba(248,113,113,0.15); border-color: var(--red); }
+
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    min-width: 150px;
+    flex: 1;
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.yellow { color: var(--yellow); }
+  .stat-card .value.red { color: var(--red); }
+  .stat-card .value.accent { color: var(--accent); }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover { color: var(--text); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Grid View */
+  .grid-container { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--surface2);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text-dim);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  th.rotate {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    max-width: 50px;
+    padding: 12px 6px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  td { background: var(--surface); }
+  td.name-cell {
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 140px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--surface);
+  }
+  td.hours-cell {
+    text-align: center;
+    cursor: pointer;
+    min-width: 50px;
+    transition: background 0.1s;
+  }
+  td.hours-cell:hover { background: var(--surface2); }
+  td.hours-cell.assigned { background: rgba(108,140,255,0.12); }
+  td.hours-cell input {
+    width: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  td.hours-cell input:focus { outline: 1px solid var(--accent); border-radius: 3px; }
+  td.total-cell {
+    font-weight: 700;
+    text-align: center;
+    background: var(--surface2);
+  }
+  .workload-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 4px;
+    background: var(--border);
+  }
+  .workload-bar .fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* People & Projects lists */
+  .list-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .list-section h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: var(--surface2);
+  }
+  .list-item .info { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .list-item .actions { display: flex; gap: 4px; }
+  .list-item .actions button { padding: 4px 8px; font-size: 11px; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.structural { background: rgba(108,140,255,0.2); color: var(--accent); }
+  .badge.mep { background: rgba(74,222,128,0.2); color: var(--green); }
+  .badge.architectural { background: rgba(167,139,250,0.2); color: var(--purple); }
+  .badge.coordination { background: rgba(34,211,238,0.2); color: var(--cyan); }
+  .badge.drafting { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .badge.other { background: rgba(139,144,165,0.2); color: var(--text-dim); }
+
+  .add-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .add-form input, .add-form select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+  }
+  .add-form input:focus, .add-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .add-form input { flex: 1; min-width: 160px; }
+
+  /* Project status */
+  .status-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* Workload view */
+  .workload-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .workload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .workload-card h4 { font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .workload-card .hours-big { font-size: 32px; font-weight: 700; }
+  .workload-card .project-list { margin-top: 10px; }
+  .workload-card .project-list .proj-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  .workload-card .project-list .proj-line:last-child { border-bottom: none; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 420px;
+  }
+  .modal h3 { margin-bottom: 16px; }
+  .modal .form-group { margin-bottom: 12px; }
+  .modal label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+  .modal input, .modal select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+  }
+  .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+  .capacity-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .stats-bar { flex-direction: column; }
+    th.rotate { writing-mode: horizontal-tb; transform: none; max-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>Indochine</span> Resource Tracker</h1>
+  <div class="header-actions">
+    <button onclick="exportData()">Export JSON</button>
+    <button onclick="importData()">Import JSON</button>
+    <button class="danger" onclick="resetAll()">Reset</button>
+  </div>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="tabs">
+  <div class="tab active" data-view="grid">Allocation Grid</div>
+  <div class="tab" data-view="workload">Workload</div>
+  <div class="tab" data-view="people">Team</div>
+  <div class="tab" data-view="projects">Projects</div>
+</div>
+
+<!-- Allocation Grid -->
+<div class="view active" id="view-grid">
+  <div class="grid-container">
+    <table id="allocationTable"></table>
+  </div>
+</div>
+
+<!-- Workload View -->
+<div class="view" id="view-workload">
+  <div class="workload-cards" id="workloadCards"></div>
+</div>
+
+<!-- People View -->
+<div class="view" id="view-people">
+  <div class="list-section">
+    <h3>Team Members</h3>
+    <div id="peopleList"></div>
+    <div class="add-form">
+      <input type="text" id="newPersonName" placeholder="Name">
+      <select id="newPersonDiscipline">
+        <option value="Structural">Structural</option>
+        <option value="MEP">MEP</option>
+        <option value="Architectural">Architectural</option>
+        <option value="Coordination">Coordination</option>
+        <option value="Drafting">Drafting</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="number" id="newPersonCapacity" placeholder="Hrs/week" value="40" style="max-width:90px">
+      <button class="primary" onclick="addPerson()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Projects View -->
+<div class="view" id="view-projects">
+  <div class="list-section">
+    <h3>Active Projects</h3>
+    <div id="projectList"></div>
+    <div class="add-form">
+      <input type="text" id="newProjectName" placeholder="Project name">
+      <select id="newProjectPhase">
+        <option value="Concept">Concept</option>
+        <option value="SD">SD</option>
+        <option value="DD">DD</option>
+        <option value="CD">CD</option>
+        <option value="CA">CA</option>
+        <option value="As-Built">As-Built</option>
+      </select>
+      <select id="newProjectPriority">
+        <option value="Normal">Normal</option>
+        <option value="High">High</option>
+        <option value="Urgent">Urgent</option>
+      </select>
+      <button class="primary" onclick="addProject()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Person Modal -->
+<div class="modal-overlay" id="editPersonModal">
+  <div class="modal">
+    <h3>Edit Team Member</h3>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="editPersonName">
+    </div>
+    <div class="form-group">
+      <label>Discipline</label>
+      <select id="editPersonDiscipline">
+        <option value="Structural">Structural</option>
+        <option value="MEP">MEP</option>
+        <option value="Architectural">Architectural</option>
+        <option value="Coordination">Coordination</option>
+        <option value="Drafting">Drafting</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Weekly Capacity (hrs)</label>
+      <input type="number" id="editPersonCapacity">
+    </div>
+    <div class="btn-row">
+      <button onclick="closeModal('editPersonModal')">Cancel</button>
+      <button class="primary" onclick="saveEditPerson()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div class="modal-overlay" id="editProjectModal">
+  <div class="modal">
+    <h3>Edit Project</h3>
+    <div class="form-group">
+      <label>Project Name</label>
+      <input type="text" id="editProjectName">
+    </div>
+    <div class="form-group">
+      <label>Phase</label>
+      <select id="editProjectPhase">
+        <option value="Concept">Concept</option>
+        <option value="SD">SD</option>
+        <option value="DD">DD</option>
+        <option value="CD">CD</option>
+        <option value="CA">CA</option>
+        <option value="As-Built">As-Built</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Priority</label>
+      <select id="editProjectPriority">
+        <option value="Normal">Normal</option>
+        <option value="High">High</option>
+        <option value="Urgent">Urgent</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Client / Notes</label>
+      <input type="text" id="editProjectClient">
+    </div>
+    <div class="btn-row">
+      <button onclick="closeModal('editProjectModal')">Cancel</button>
+      <button class="primary" onclick="saveEditProject()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'indochine_resources';
+const DISCIPLINES = ['Structural','MEP','Architectural','Coordination','Drafting','Other'];
+const DISC_COLORS = {structural:'#6c8cff',mep:'#4ade80',architectural:'#a78bfa',coordination:'#22d3ee',drafting:'#fbbf24',other:'#8b90a5'};
+
+let state = loadState();
+
+function defaultState() {
+  return { people: [], projects: [], allocations: {} };
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return defaultState();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function allocKey(personId, projectId) { return `${personId}__${projectId}`; }
+
+function getHours(personId, projectId) {
+  return state.allocations[allocKey(personId, projectId)] || 0;
+}
+
+function setHours(personId, projectId, hrs) {
+  const k = allocKey(personId, projectId);
+  if (hrs > 0) state.allocations[k] = hrs;
+  else delete state.allocations[k];
+  save();
+  renderAll();
+}
+
+function totalHoursForPerson(personId) {
+  return state.projects.reduce((sum, p) => sum + getHours(personId, p.id), 0);
+}
+
+function totalHoursForProject(projectId) {
+  return state.people.reduce((sum, p) => sum + getHours(p.id, projectId), 0);
+}
+
+function capacityColor(used, capacity) {
+  const pct = capacity > 0 ? used / capacity : 0;
+  if (pct <= 0.7) return 'var(--green)';
+  if (pct <= 0.9) return 'var(--yellow)';
+  if (pct <= 1.0) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function capacityLabel(used, capacity) {
+  const pct = capacity > 0 ? Math.round((used / capacity) * 100) : 0;
+  return `${pct}%`;
+}
+
+// --- Rendering ---
+
+function renderAll() {
+  renderStats();
+  renderGrid();
+  renderWorkload();
+  renderPeopleList();
+  renderProjectList();
+}
+
+function renderStats() {
+  const totalPeople = state.people.length;
+  const totalProjects = state.projects.length;
+  const totalCapacity = state.people.reduce((s, p) => s + (p.capacity || 40), 0);
+  const totalAllocated = state.people.reduce((s, p) => s + totalHoursForPerson(p.id), 0);
+  const overloaded = state.people.filter(p => totalHoursForPerson(p.id) > (p.capacity || 40)).length;
+  const utilPct = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="label">Team</div><div class="value accent">${totalPeople}</div></div>
+    <div class="stat-card"><div class="label">Projects</div><div class="value accent">${totalProjects}</div></div>
+    <div class="stat-card"><div class="label">Utilisation</div><div class="value ${utilPct > 95 ? 'red' : utilPct > 80 ? 'yellow' : 'green'}">${utilPct}%</div></div>
+    <div class="stat-card"><div class="label">Allocated / Capacity</div><div class="value">${totalAllocated}<span style="color:var(--text-dim);font-size:16px">/${totalCapacity}h</span></div></div>
+    <div class="stat-card"><div class="label">Overloaded</div><div class="value ${overloaded > 0 ? 'red' : 'green'}">${overloaded}</div></div>
+  `;
+}
+
+function renderGrid() {
+  if (!state.people.length || !state.projects.length) {
+    document.getElementById('allocationTable').innerHTML = `
+      <tr><td style="padding:40px;text-align:center;color:var(--text-dim)">
+        Add team members and projects to see the allocation grid
+      </td></tr>`;
+    return;
+  }
+  let html = '<thead><tr><th>Team Member</th>';
+  state.projects.forEach(p => {
+    const prioIcon = p.priority === 'Urgent' ? ' !!!' : p.priority === 'High' ? ' !' : '';
+    html += `<th class="rotate" title="${p.name} (${p.phase})">${p.name}<br><span style="font-size:10px;color:var(--text-dim)">${p.phase}${prioIcon}</span></th>`;
+  });
+  html += '<th>Total</th><th>Load</th></tr></thead><tbody>';
+
+  state.people.forEach(person => {
+    const total = totalHoursForPerson(person.id);
+    const cap = person.capacity || 40;
+    const color = capacityColor(total, cap);
+    const discClass = person.discipline.toLowerCase();
+    html += `<tr><td class="name-cell"><span class="capacity-indicator" style="background:${color}"></span>${person.name} <span class="badge ${discClass}">${person.discipline}</span></td>`;
+    state.projects.forEach(proj => {
+      const hrs = getHours(person.id, proj.id);
+      const cls = hrs > 0 ? 'hours-cell assigned' : 'hours-cell';
+      html += `<td class="${cls}"><input type="number" min="0" max="80" value="${hrs || ''}" placeholder="·"
+        onchange="setHours('${person.id}','${proj.id}', parseInt(this.value)||0)"
+        onfocus="this.select()"></td>`;
+    });
+    const pct = cap > 0 ? Math.round((total/cap)*100) : 0;
+    html += `<td class="total-cell">${total}h</td>`;
+    html += `<td class="total-cell" style="min-width:80px">
+      <div style="color:${color};font-weight:700">${pct}%</div>
+      <div class="workload-bar"><div class="fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+    </td></tr>`;
+  });
+
+  // Project totals row
+  html += '<tr><td class="name-cell" style="font-weight:700;background:var(--surface2)">Project Totals</td>';
+  state.projects.forEach(proj => {
+    html += `<td class="total-cell">${totalHoursForProject(proj.id)}h</td>`;
+  });
+  const grandTotal = state.people.reduce((s, p) => s + totalHoursForPerson(p.id), 0);
+  html += `<td class="total-cell" style="color:var(--accent)">${grandTotal}h</td><td class="total-cell"></td></tr>`;
+  html += '</tbody>';
+  document.getElementById('allocationTable').innerHTML = html;
+}
+
+function renderWorkload() {
+  let html = '';
+  const sorted = [...state.people].sort((a, b) => {
+    const aLoad = totalHoursForPerson(a.id) / (a.capacity || 40);
+    const bLoad = totalHoursForPerson(b.id) / (b.capacity || 40);
+    return bLoad - aLoad;
+  });
+  sorted.forEach(person => {
+    const total = totalHoursForPerson(person.id);
+    const cap = person.capacity || 40;
+    const color = capacityColor(total, cap);
+    const pct = cap > 0 ? Math.round((total/cap)*100) : 0;
+    const discClass = person.discipline.toLowerCase();
+
+    let projects = '';
+    state.projects.forEach(proj => {
+      const hrs = getHours(person.id, proj.id);
+      if (hrs > 0) {
+        projects += `<div class="proj-line"><span>${proj.name} (${proj.phase})</span><span style="color:var(--text);font-weight:600">${hrs}h</span></div>`;
+      }
+    });
+    if (!projects) projects = '<div style="color:var(--text-dim);font-size:12px;padding:4px 0">No assignments</div>';
+
+    html += `<div class="workload-card">
+      <h4><span><span class="capacity-indicator" style="background:${color}"></span>${person.name} <span class="badge ${discClass}">${person.discipline}</span></span><span style="color:${color}">${pct}%</span></h4>
+      <div class="hours-big" style="color:${color}">${total}<span style="font-size:14px;color:var(--text-dim)">/${cap}h</span></div>
+      <div class="workload-bar" style="margin:8px 0"><div class="fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+      <div class="project-list">${projects}</div>
+    </div>`;
+  });
+  document.getElementById('workloadCards').innerHTML = html || '<div style="color:var(--text-dim);padding:20px">Add team members to see workload</div>';
+}
+
+function renderPeopleList() {
+  let html = '';
+  state.people.forEach(p => {
+    const total = totalHoursForPerson(p.id);
+    const cap = p.capacity || 40;
+    const color = capacityColor(total, cap);
+    const discClass = p.discipline.toLowerCase();
+    html += `<div class="list-item">
+      <div class="info">
+        <span class="capacity-indicator" style="background:${color}"></span>
+        <strong>${p.name}</strong>
+        <span class="badge ${discClass}">${p.discipline}</span>
+        <span style="color:var(--text-dim);font-size:12px">${cap}h/week</span>
+      </div>
+      <div class="actions">
+        <button onclick="editPerson('${p.id}')">Edit</button>
+        <button class="danger" onclick="removePerson('${p.id}')">Remove</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('peopleList').innerHTML = html || '<div style="color:var(--text-dim);padding:8px">No team members yet</div>';
+}
+
+function renderProjectList() {
+  let html = '';
+  state.projects.forEach(p => {
+    const total = totalHoursForProject(p.id);
+    const prioStyle = p.priority === 'Urgent' ? 'color:var(--red)' : p.priority === 'High' ? 'color:var(--orange)' : '';
+    html += `<div class="list-item">
+      <div class="info">
+        <strong>${p.name}</strong>
+        <span class="badge other">${p.phase}</span>
+        <span style="font-size:12px;${prioStyle}">${p.priority}</span>
+        <span style="color:var(--text-dim);font-size:12px">${total}h allocated</span>
+        ${p.client ? `<span style="color:var(--text-dim);font-size:12px">· ${p.client}</span>` : ''}
+      </div>
+      <div class="actions">
+        <button onclick="editProject('${p.id}')">Edit</button>
+        <button class="danger" onclick="removeProject('${p.id}')">Remove</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('projectList').innerHTML = html || '<div style="color:var(--text-dim);padding:8px">No projects yet</div>';
+}
+
+// --- CRUD ---
+
+function addPerson() {
+  const name = document.getElementById('newPersonName').value.trim();
+  if (!name) return;
+  const discipline = document.getElementById('newPersonDiscipline').value;
+  const capacity = parseInt(document.getElementById('newPersonCapacity').value) || 40;
+  state.people.push({ id: uid(), name, discipline, capacity });
+  save();
+  document.getElementById('newPersonName').value = '';
+  renderAll();
+}
+
+function addProject() {
+  const name = document.getElementById('newProjectName').value.trim();
+  if (!name) return;
+  const phase = document.getElementById('newProjectPhase').value;
+  const priority = document.getElementById('newProjectPriority').value;
+  state.projects.push({ id: uid(), name, phase, priority, client: '' });
+  save();
+  document.getElementById('newProjectName').value = '';
+  renderAll();
+}
+
+let editingPersonId = null;
+function editPerson(id) {
+  editingPersonId = id;
+  const p = state.people.find(x => x.id === id);
+  document.getElementById('editPersonName').value = p.name;
+  document.getElementById('editPersonDiscipline').value = p.discipline;
+  document.getElementById('editPersonCapacity').value = p.capacity || 40;
+  document.getElementById('editPersonModal').classList.add('show');
+}
+function saveEditPerson() {
+  const p = state.people.find(x => x.id === editingPersonId);
+  if (p) {
+    p.name = document.getElementById('editPersonName').value.trim() || p.name;
+    p.discipline = document.getElementById('editPersonDiscipline').value;
+    p.capacity = parseInt(document.getElementById('editPersonCapacity').value) || 40;
+    save();
+    renderAll();
+  }
+  closeModal('editPersonModal');
+}
+
+let editingProjectId = null;
+function editProject(id) {
+  editingProjectId = id;
+  const p = state.projects.find(x => x.id === id);
+  document.getElementById('editProjectName').value = p.name;
+  document.getElementById('editProjectPhase').value = p.phase;
+  document.getElementById('editProjectPriority').value = p.priority;
+  document.getElementById('editProjectClient').value = p.client || '';
+  document.getElementById('editProjectModal').classList.add('show');
+}
+function saveEditProject() {
+  const p = state.projects.find(x => x.id === editingProjectId);
+  if (p) {
+    p.name = document.getElementById('editProjectName').value.trim() || p.name;
+    p.phase = document.getElementById('editProjectPhase').value;
+    p.priority = document.getElementById('editProjectPriority').value;
+    p.client = document.getElementById('editProjectClient').value.trim();
+    save();
+    renderAll();
+  }
+  closeModal('editProjectModal');
+}
+
+function removePerson(id) {
+  if (!confirm('Remove this team member? Their allocations will be cleared.')) return;
+  state.people = state.people.filter(p => p.id !== id);
+  Object.keys(state.allocations).forEach(k => { if (k.startsWith(id + '__')) delete state.allocations[k]; });
+  save();
+  renderAll();
+}
+
+function removeProject(id) {
+  if (!confirm('Remove this project? All allocations to it will be cleared.')) return;
+  state.projects = state.projects.filter(p => p.id !== id);
+  Object.keys(state.allocations).forEach(k => { if (k.endsWith('__' + id)) delete state.allocations[k]; });
+  save();
+  renderAll();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// --- Import / Export ---
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `indochine-resources-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.people && data.projects) {
+          state = data;
+          save();
+          renderAll();
+        } else {
+          alert('Invalid file format');
+        }
+      } catch(err) { alert('Error reading file: ' + err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetAll() {
+  if (!confirm('Reset all data? This cannot be undone.')) return;
+  state = defaultState();
+  save();
+  renderAll();
+}
+
+// --- Tabs ---
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+  });
+});
+
+// Enter key in add forms
+document.getElementById('newPersonName').addEventListener('keydown', e => { if (e.key === 'Enter') addPerson(); });
+document.getElementById('newProjectName').addEventListener('keydown', e => { if (e.key === 'Enter') addProject(); });
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+});
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>
