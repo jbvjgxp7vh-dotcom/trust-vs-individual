@@ -329,8 +329,12 @@
 <header>
   <h1><span>Indochine</span> Resource Tracker</h1>
   <div class="header-actions">
-    <button onclick="exportData()">Export JSON</button>
-    <button onclick="importData()">Import JSON</button>
+    <span id="syncStatus" style="font-size:12px;display:flex;align-items:center;padding:0 8px;color:var(--text-dim)"></span>
+    <button onclick="cloudLoad()">Pull</button>
+    <button onclick="cloudSave()">Push</button>
+    <button onclick="setupToken()" title="Set GitHub token for cloud sync">Token</button>
+    <button onclick="exportData()">Export</button>
+    <button onclick="importData()">Import</button>
     <button class="danger" onclick="resetAll()">Reset</button>
   </div>
 </header>
@@ -472,10 +476,21 @@
 
 <script>
 const STORAGE_KEY = 'indochine_resources';
+const GH_OWNER = 'jbvjgxp7vh-dotcom';
+const GH_REPO = 'trust-vs-individual';
+const GH_FILE = 'data.json';
+const GH_PAGES_URL = `https://${GH_OWNER}.github.io/${GH_REPO}/${GH_FILE}`;
+const GH_API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 const DISCIPLINES = ['Structural','MEP','Architectural','Coordination','Drafting','Other'];
 const DISC_COLORS = {structural:'#6c8cff',mep:'#4ade80',architectural:'#a78bfa',coordination:'#22d3ee',drafting:'#fbbf24',other:'#8b90a5'};
 
 let state = loadState();
+let syncTimer = null;
+let ghSha = null;
+
+function getToken() {
+  return localStorage.getItem('gh_token') || '';
+}
 
 function defaultState() {
   const p1='s1',p2='s2',p3='s3',p4='s4',p5='s5',p6='s6',p7='s7',p8='s8';
@@ -526,6 +541,86 @@ function loadState() {
 
 function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  debouncedCloudSave();
+}
+
+function debouncedCloudSave() {
+  clearTimeout(syncTimer);
+  setSyncStatus('pending');
+  syncTimer = setTimeout(() => cloudSave(), 2000);
+}
+
+async function cloudSave() {
+  const token = getToken();
+  if (!token) { setSyncStatus('no-token'); return; }
+  setSyncStatus('saving');
+  try {
+    if (!ghSha) {
+      const meta = await fetch(GH_API_URL, {
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (meta.ok) { const j = await meta.json(); ghSha = j.sha; }
+    }
+    const body = { message: 'Update resource tracker data', content: btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2)))), sha: ghSha };
+    const res = await fetch(GH_API_URL, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      const j = await res.json();
+      ghSha = j.content.sha;
+      setSyncStatus('saved');
+    } else {
+      ghSha = null;
+      setSyncStatus('error');
+    }
+  } catch(e) {
+    setSyncStatus('error');
+  }
+}
+
+async function cloudLoad() {
+  setSyncStatus('loading');
+  try {
+    const res = await fetch(GH_PAGES_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (data.people && data.projects) {
+      state = data;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderAll();
+      setSyncStatus('saved');
+      return true;
+    }
+  } catch(e) {
+    setSyncStatus('error');
+  }
+  return false;
+}
+
+function setupToken() {
+  const current = getToken();
+  const token = prompt('Enter GitHub PAT (fine-grained, contents:write on trust-vs-individual repo):', current);
+  if (token !== null) {
+    localStorage.setItem('gh_token', token.trim());
+    setSyncStatus('saved');
+  }
+}
+
+function setSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  const map = {
+    saved: { text: 'Synced', color: 'var(--green)' },
+    saving: { text: 'Saving...', color: 'var(--yellow)' },
+    pending: { text: 'Unsaved', color: 'var(--yellow)' },
+    loading: { text: 'Loading...', color: 'var(--accent)' },
+    error: { text: 'Sync error', color: 'var(--red)' },
+    offline: { text: 'Local only', color: 'var(--text-dim)' },
+    'no-token': { text: 'No token — read only', color: 'var(--orange)' }
+  };
+  const s = map[status] || map.offline;
+  el.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${s.color};margin-right:6px"></span>${s.text}`;
 }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -865,8 +960,11 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
 });
 
-// Initial render
+// Initial render — try cloud first, fall back to local/default
 renderAll();
+cloudLoad().then(loaded => {
+  if (!loaded) setSyncStatus('offline');
+});
 </script>
 </body>
 </html>
