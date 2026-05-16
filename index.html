@@ -3,923 +3,1985 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trust vs Individual Ownership — Multi-Property Portfolio (Australia)</title>
+<title>Trust vs Individual — Property Structure Comparison</title>
 <style>
   :root {
     --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #232733;
-    --border: #2e3344;
+    --card: #1a1d27;
+    --card-alt: #222632;
+    --border: #2d3348;
     --text: #e4e6ed;
-    --muted: #8b8fa3;
+    --text-muted: #8b90a0;
     --accent: #6c8cff;
     --green: #4ade80;
     --red: #f87171;
     --amber: #fbbf24;
-    --green-bg: rgba(74, 222, 128, 0.08);
-    --red-bg: rgba(248, 113, 113, 0.08);
-    --amber-bg: rgba(251, 191, 36, 0.08);
+    --teal: #2dd4bf;
+    --purple: #a78bfa;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
     padding: 24px;
-    max-width: 1400px;
+    line-height: 1.5;
+    max-width: 1200px;
     margin: 0 auto;
   }
-
   h1 {
-    font-size: 1.6rem;
+    font-size: 28px;
     font-weight: 700;
     margin-bottom: 4px;
   }
-
   .subtitle {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 28px;
-  }
-
-  /* Scoreboard */
-  .scoreboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    color: var(--text-muted);
+    font-size: 14px;
     margin-bottom: 32px;
   }
-
-  .score-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-  }
-
-  .score-card .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .score-card .value {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-
-  .score-card .detail {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* Tabs */
-  .tab-bar {
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
     display: flex;
-    gap: 4px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
+    align-items: center;
+    gap: 8px;
   }
-
-  .tab-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.85rem;
-    padding: 10px 18px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: all 0.15s;
-  }
-
-  .tab-btn:hover { color: var(--text); }
-
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* Comparison table */
-  .comp-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-bottom: 24px;
-  }
-
-  .comp-table thead th {
-    background: var(--surface2);
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-  }
-
-  .comp-table thead th:first-child {
-    border-radius: 8px 0 0 0;
-    width: 220px;
-  }
-
-  .comp-table thead th:last-child {
-    border-radius: 0 8px 0 0;
-  }
-
-  .comp-table tbody td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.88rem;
-    vertical-align: top;
-  }
-
-  .comp-table tbody tr:last-child td { border-bottom: none; }
-
-  .comp-table tbody td:first-child {
-    font-weight: 600;
-    color: var(--text);
-    background: var(--surface);
-  }
-
-  .comp-table tbody td:nth-child(2) {
-    background: var(--surface);
-  }
-
-  .comp-table tbody td:nth-child(3) {
-    background: var(--surface);
-  }
-
-  .verdict-tag {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 600;
+  h2 .badge {
+    font-size: 11px;
+    font-weight: 500;
     padding: 2px 8px;
     border-radius: 4px;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    margin-top: 6px;
+    letter-spacing: 0.5px;
   }
+  .badge-green { background: rgba(74,222,128,0.15); color: var(--green); }
+  .badge-amber { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .badge-red { background: rgba(248,113,113,0.15); color: var(--red); }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple); }
 
-  .verdict-trust {
-    background: var(--green-bg);
-    color: var(--green);
+  .section { margin-bottom: 40px; }
+
+  /* Property card */
+  .property-header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
   }
-
-  .verdict-individual {
-    background: var(--amber-bg);
-    color: var(--amber);
-  }
-
-  .verdict-draw {
-    background: rgba(108, 140, 255, 0.1);
-    color: var(--accent);
-  }
-
-  .verdict-risk {
-    background: var(--red-bg);
-    color: var(--red);
-  }
-
-  /* Callout box */
-  .callout {
-    background: var(--surface);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 16px 20px;
-    margin: 20px 0;
-    font-size: 0.85rem;
-  }
-
-  .callout strong {
-    display: block;
+  .property-header h3 {
+    font-size: 20px;
     margin-bottom: 4px;
-    color: var(--accent);
   }
-
-  /* Scenario cards */
-  .scenario-grid {
+  .property-meta {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .key-facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .fact {
+    background: var(--card-alt);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .fact-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .fact-value {
+    font-size: 18px;
+    font-weight: 600;
   }
 
-  .scenario-card {
-    background: var(--surface);
+  /* Comparison table */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 768px) {
+    .comparison-grid { grid-template-columns: 1fr; }
+  }
+  .option-card {
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
-    cursor: pointer;
-    transition: border-color 0.15s;
+    position: relative;
   }
-
-  .scenario-card:hover {
-    border-color: var(--accent);
+  .option-card.recommended {
+    border-color: var(--green);
+    box-shadow: 0 0 20px rgba(74,222,128,0.08);
   }
-
-  .scenario-card h3 {
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-  }
-
-  .scenario-card p {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .scenario-card .rec {
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 4px 10px;
+  .option-card.recommended::before {
+    content: 'RECOMMENDED';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--green);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 10px;
     border-radius: 4px;
-    display: inline-block;
+    letter-spacing: 0.5px;
   }
+  .option-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .option-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .option-row:last-child { border-bottom: none; }
+  .option-row .label { color: var(--text-muted); }
+  .option-row .value { font-weight: 600; text-align: right; }
+  .option-row .value.good { color: var(--green); }
+  .option-row .value.bad { color: var(--red); }
+  .option-row .value.neutral { color: var(--amber); }
 
-  .rec-trust { background: var(--green-bg); color: var(--green); }
-  .rec-individual { background: var(--amber-bg); color: var(--amber); }
-  .rec-depends { background: rgba(108, 140, 255, 0.1); color: var(--accent); }
+  .total-row {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+  }
+  .total-row .value { font-weight: 700; font-size: 18px; }
 
-  /* Cost estimator */
-  .cost-grid {
+  /* Pros/cons */
+  .pros-cons {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-top: 16px;
   }
+  @media (max-width: 600px) {
+    .pros-cons { grid-template-columns: 1fr; }
+  }
+  .pros-cons ul {
+    list-style: none;
+    font-size: 13px;
+  }
+  .pros-cons li {
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  .pros-cons li::before {
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+  .pros li::before { content: '+'; color: var(--green); }
+  .cons li::before { content: '−'; color: var(--red); }
 
-  .cost-col {
-    background: var(--surface);
+  /* Budget rules callout */
+  .callout {
+    background: var(--card);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+  }
+  .callout-title {
+    font-weight: 600;
+    color: var(--amber);
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .callout p { color: var(--text-muted); margin-bottom: 6px; }
+  .callout strong { color: var(--text); }
+
+  /* Portfolio table */
+  table.portfolio {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table.portfolio thead {
+    background: var(--card-alt);
+  }
+  table.portfolio th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  table.portfolio td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.portfolio tr:last-child td { border-bottom: none; }
+  table.portfolio tr.highlight {
+    background: rgba(74,222,128,0.05);
+  }
+  table.portfolio tr.section-header td {
+    background: var(--card-alt);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    padding: 8px 16px;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .tag-individual { background: rgba(108,140,255,0.15); color: var(--accent); }
+  .tag-trust { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+  /* Summary boxes */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .summary-box {
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
   }
-
-  .cost-col h3 {
-    font-size: 0.9rem;
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+  .summary-box h4 {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
   }
-
-  .cost-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    font-size: 0.85rem;
-  }
-
-  .cost-line .amount { font-weight: 600; }
-
-  .cost-total {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0 0;
-    margin-top: 10px;
-    border-top: 1px solid var(--border);
+  .summary-box .big-number {
+    font-size: 28px;
     font-weight: 700;
-    font-size: 0.95rem;
+  }
+  .summary-box .detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
   }
 
-  /* Property slider */
-  .slider-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--surface);
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .neg { color: var(--red); }
+  .pos { color: var(--green); }
+
+  /* ===== Interactive Model ===== */
+  .model-wrap {
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
+    padding: 0;
+    overflow: hidden;
   }
-
-  .slider-row label {
-    font-size: 0.85rem;
-    min-width: 160px;
+  .tabs {
+    display: flex;
+    background: var(--card-alt);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
   }
-
-  .slider-row input[type="range"] {
+  .tab-btn {
     flex: 1;
+    min-width: 140px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--card);
+  }
+  .tab-panel { display: none; padding: 24px; }
+  .tab-panel.active { display: block; }
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    .model-grid { grid-template-columns: 1fr; }
+  }
+  .controls { display: flex; flex-direction: column; gap: 14px; }
+  .ctrl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    align-items: center;
+  }
+  .ctrl label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .ctrl .ctrl-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: right;
+    min-width: 90px;
+    font-variant-numeric: tabular-nums;
+  }
+  .ctrl input[type="range"] {
+    grid-column: 1 / -1;
+    width: 100%;
     accent-color: var(--accent);
   }
-
-  .slider-row .slider-val {
-    font-weight: 700;
-    min-width: 40px;
-    text-align: right;
-    font-size: 1.1rem;
+  .ctrl select, .ctrl input[type="number"] {
+    grid-column: 1 / -1;
+    background: var(--card-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
   }
-
-  /* Decision matrix */
-  .matrix-row {
-    display: flex;
-    align-items: stretch;
-    gap: 2px;
-    margin-bottom: 2px;
+  .toggle-group {
+    display: inline-flex;
+    background: var(--card-alt);
+    border-radius: 8px;
+    padding: 3px;
+    border: 1px solid var(--border);
   }
-
-  .matrix-label {
-    background: var(--surface);
-    padding: 12px 16px;
-    font-size: 0.82rem;
+  .toggle-group button {
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
     font-weight: 600;
-    min-width: 180px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: inherit;
+  }
+  .toggle-group button.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .outputs {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .out-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 14px;
+    background: var(--card-alt);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .out-row.headline {
+    background: rgba(108,140,255,0.08);
+    border: 1px solid rgba(108,140,255,0.25);
+    padding: 14px;
+  }
+  .out-row .out-label { color: var(--text-muted); }
+  .out-row .out-val {
+    font-weight: 700;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .out-row.headline .out-val { font-size: 22px; }
+  .timeline {
+    margin-top: 16px;
+    background: var(--card-alt);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 110px 90px;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
     align-items: center;
-    border-radius: 6px 0 0 6px;
   }
-
-  .matrix-cell {
-    flex: 1;
-    padding: 12px 16px;
-    font-size: 0.8rem;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .matrix-cell:last-child { border-radius: 0 6px 6px 0; }
-
-  .cell-green { background: var(--green-bg); color: var(--green); }
-  .cell-red { background: var(--red-bg); color: var(--red); }
-  .cell-amber { background: var(--amber-bg); color: var(--amber); }
-  .cell-neutral { background: var(--surface2); color: var(--muted); }
-
-  .matrix-header {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 4px;
-  }
-
-  .matrix-header span {
-    flex: 1;
-    text-align: center;
-    font-size: 0.72rem;
+  .timeline-row:last-child { border-bottom: none; }
+  .timeline-row.head {
+    color: var(--text-muted);
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+  .bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+  }
+  .chart {
+    width: 100%;
+    height: 320px;
+    background: var(--card-alt);
+    border-radius: 8px;
     padding: 8px;
   }
-
-  .matrix-header span:first-child { min-width: 180px; }
-
-  footer {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.75rem;
-    text-align: center;
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    margin-top: 12px;
+    color: var(--text-muted);
   }
-
-  @media (max-width: 768px) {
-    body { padding: 16px; }
-    .cost-grid { grid-template-columns: 1fr; }
-    .comp-table { font-size: 0.8rem; }
-    .matrix-label { min-width: 120px; font-size: 0.75rem; }
-    .matrix-cell { font-size: 0.72rem; padding: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
   }
 </style>
 </head>
 <body>
 
-<h1>Trust vs Individual Ownership</h1>
-<p class="subtitle">Multi-property portfolio in Australia · Mum + Dad as buyers · General guidance only — not legal or tax advice</p>
+<h1>Trust vs Individual</h1>
+<p class="subtitle">Property ownership structure comparison — 2 McPherson St, Horsham VIC &amp; 10-property portfolio projection &bull; Prepared 15 May 2026 &bull; Updated 16 May 2026: priority = portfolio scale over holding cost; capital cadence integrated</p>
 
-<!-- Scoreboard -->
-<div class="scoreboard">
-  <div class="score-card">
-    <div class="label">Trust Wins</div>
-    <div class="value" style="color:var(--green)" id="trustWins">7</div>
-    <div class="detail">out of 12 factors</div>
-  </div>
-  <div class="score-card">
-    <div class="label">Individual Wins</div>
-    <div class="value" style="color:var(--amber)" id="indivWins">3</div>
-    <div class="detail">out of 12 factors</div>
-  </div>
-  <div class="score-card">
-    <div class="label">Depends / Draw</div>
-    <div class="value" style="color:var(--accent)" id="drawCount">2</div>
-    <div class="detail">out of 12 factors</div>
-  </div>
-  <div class="score-card">
-    <div class="label">Setup Cost (Trust)</div>
-    <div class="value" id="setupCost">$2.5k–$5k</div>
-    <div class="detail">+ ~$1.5k/yr ongoing</div>
-  </div>
-</div>
+<!-- PROPERTY 1: McPHERSON -->
+<div class="section">
+  <h2>2 McPherson St, Horsham VIC 3400 <span class="badge badge-green">Under Contract</span> <span class="badge badge-purple">Grandfathered</span></h2>
 
-<!-- Tabs -->
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
-  <button class="tab-btn" onclick="showTab('detailed')">Detailed Comparison</button>
-  <button class="tab-btn" onclick="showTab('tax')">Tax Deep-Dive</button>
-  <button class="tab-btn" onclick="showTab('costs')">Cost Estimator</button>
-  <button class="tab-btn" onclick="showTab('scenarios')">Scenarios</button>
-  <button class="tab-btn" onclick="showTab('matrix')">Decision Matrix</button>
-</div>
-
-<!-- OVERVIEW TAB -->
-<div class="tab-content active" id="tab-overview">
+  <div class="property-header">
+    <h3>Property Overview</h3>
+    <p class="property-meta">Period weatherboard &bull; 3 bed / 1 bath / 2 car &bull; 699 m² &bull; Contract signed 7 May 2026</p>
+    <div class="key-facts">
+      <div class="fact">
+        <div class="fact-label">Purchase Price</div>
+        <div class="fact-value">$485,000</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Est. Rent</div>
+        <div class="fact-value">$470/wk</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Gross Yield</div>
+        <div class="fact-value">5.04%</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Finance Due</div>
+        <div class="fact-value">29 May</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Cash Available</div>
+        <div class="fact-value">$135,000</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Buyer on Contract</div>
+        <div class="fact-value">Mai Campbell</div>
+      </div>
+    </div>
+  </div>
 
   <div class="callout">
-    <strong>Key takeaway</strong>
-    For a growing multi-property portfolio, a discretionary family trust generally wins on asset protection, flexibility, and tax planning — but the lending disadvantage (no negative gearing pass-through) is the single biggest practical hurdle that stops many investors.
+    <div class="callout-title">Grandfathered — Pre-Budget Contract</div>
+    <p>Contract signed <strong>7 May 2026</strong>, before the 12 May 2026 budget announcement. This property is <strong>exempt from negative gearing quarantine rules</strong>. Full negative gearing against PAYG income is preserved under individual ownership.</p>
+    <p>Grandfathering is triggered by <strong>contract date</strong>, not settlement date — confirmed.</p>
   </div>
 
-  <table class="comp-table">
+  <!-- Three options -->
+  <h2>Finance Options — Broker Quotes (Jenny Huang, Grab Home Loans)</h2>
+
+  <div class="comparison-grid">
+    <!-- Option A: Mai Individual 90% -->
+    <div class="option-card recommended">
+      <div class="option-title">A: Mai Individual @ 90% LVR</div>
+      <div class="option-row"><span class="label">Loan amount</span><span class="value">$436,500</span></div>
+      <div class="option-row"><span class="label">Deposit required</span><span class="value">$48,500</span></div>
+      <div class="option-row"><span class="label">Stamp duty (VIC)</span><span class="value">~$25,000</span></div>
+      <div class="option-row"><span class="label">Legals + B&P</span><span class="value">~$3,000</span></div>
+      <div class="option-row"><span class="label">LMI</span><span class="value good">$0 (waiver)</span></div>
+      <div class="option-row"><span class="label">Total cash out</span><span class="value">$76,500</span></div>
+      <div class="option-row"><span class="label">Cash remaining</span><span class="value good">$58,500</span></div>
+      <div class="option-row"><span class="label">Rate (IO variable)</span><span class="value good">6.47%</span></div>
+      <div class="option-row"><span class="label">Interest / year</span><span class="value">$28,242</span></div>
+      <div class="option-row"><span class="label">Expenses (ex-int)</span><span class="value">$7,761</span></div>
+      <div class="option-row"><span class="label">Rent income / year</span><span class="value">$24,440</span></div>
+      <div class="total-row">
+        <span class="label">Annual shortfall</span>
+        <span class="value neg">−$11,563</span>
+      </div>
+      <div class="total-row">
+        <span class="label">Weekly out-of-pocket</span>
+        <span class="value neg">−$222/wk</span>
+      </div>
+      <div class="total-row">
+        <span class="label">After tax (45% marginal)</span>
+        <span class="value neg">−$122/wk</span>
+      </div>
+
+      <div class="pros-cons">
+        <ul class="pros">
+          <li>Lowest rate (6.47%)</li>
+          <li>No LMI — professional waiver</li>
+          <li>Neg gearing offsets PAYG (grandfathered)</li>
+          <li>$58.5K left for next property</li>
+          <li>Offset account guaranteed</li>
+        </ul>
+        <ul class="cons">
+          <li>No asset protection</li>
+          <li>No distribution flexibility</li>
+          <li>Debt on Mai's personal balance sheet</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Option B: Trust 90% -->
+    <div class="option-card">
+      <div class="option-title">B: Trust @ 90% LVR</div>
+      <div class="option-row"><span class="label">Loan amount</span><span class="value">$436,500</span></div>
+      <div class="option-row"><span class="label">Deposit required</span><span class="value">$48,500</span></div>
+      <div class="option-row"><span class="label">Stamp duty (VIC)</span><span class="value">~$25,000</span></div>
+      <div class="option-row"><span class="label">Legals + B&P</span><span class="value">~$3,000</span></div>
+      <div class="option-row"><span class="label">LMI</span><span class="value bad">~$10,000</span></div>
+      <div class="option-row"><span class="label">Total cash out</span><span class="value">$86,500</span></div>
+      <div class="option-row"><span class="label">Cash remaining</span><span class="value neutral">$48,500</span></div>
+      <div class="option-row"><span class="label">Rate (IO variable)</span><span class="value bad">7.09%</span></div>
+      <div class="option-row"><span class="label">Interest / year</span><span class="value">$30,948</span></div>
+      <div class="option-row"><span class="label">Expenses (ex-int)</span><span class="value">$7,761</span></div>
+      <div class="option-row"><span class="label">Rent income / year</span><span class="value">$24,440</span></div>
+      <div class="total-row">
+        <span class="label">Annual shortfall</span>
+        <span class="value neg">−$14,269</span>
+      </div>
+      <div class="total-row">
+        <span class="label">Weekly out-of-pocket</span>
+        <span class="value neg">−$274/wk</span>
+      </div>
+      <div class="total-row">
+        <span class="label">After tax (losses carried fwd)</span>
+        <span class="value neg">−$274/wk</span>
+      </div>
+
+      <div class="pros-cons">
+        <ul class="pros">
+          <li>Asset protection</li>
+          <li>Distribution flexibility</li>
+          <li>Grandfathered from new trust rules</li>
+          <li>Losses carry forward indefinitely</li>
+        </ul>
+        <ul class="cons">
+          <li>Highest rate (7.09%)</li>
+          <li>LMI payable (~$10K) — no waiver for trust</li>
+          <li>No tax benefit until positively geared</li>
+          <li>2nd-tier lender — offset may not be available</li>
+          <li>~$1.5–2K/yr trust admin costs</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Option C: Trust 80% -->
+    <div class="option-card">
+      <div class="option-title">C: Trust @ 80% LVR</div>
+      <div class="option-row"><span class="label">Loan amount</span><span class="value">$388,000</span></div>
+      <div class="option-row"><span class="label">Deposit required</span><span class="value">$97,000</span></div>
+      <div class="option-row"><span class="label">Stamp duty (VIC)</span><span class="value">~$25,000</span></div>
+      <div class="option-row"><span class="label">Legals + B&P</span><span class="value">~$3,000</span></div>
+      <div class="option-row"><span class="label">LMI</span><span class="value good">$0</span></div>
+      <div class="option-row"><span class="label">Total cash out</span><span class="value">$125,000</span></div>
+      <div class="option-row"><span class="label">Cash remaining</span><span class="value bad">$10,000</span></div>
+      <div class="option-row"><span class="label">Rate (IO variable)</span><span class="value neutral">6.69%</span></div>
+      <div class="option-row"><span class="label">Interest / year</span><span class="value">$25,957</span></div>
+      <div class="option-row"><span class="label">Expenses (ex-int)</span><span class="value">$7,761</span></div>
+      <div class="option-row"><span class="label">Rent income / year</span><span class="value">$24,440</span></div>
+      <div class="total-row">
+        <span class="label">Annual shortfall</span>
+        <span class="value neg">−$9,278</span>
+      </div>
+      <div class="total-row">
+        <span class="label">Weekly out-of-pocket</span>
+        <span class="value neg">−$178/wk</span>
+      </div>
+      <div class="total-row">
+        <span class="label">After tax (losses carried fwd)</span>
+        <span class="value neg">−$178/wk</span>
+      </div>
+
+      <div class="pros-cons">
+        <ul class="pros">
+          <li>Lowest shortfall of all options</li>
+          <li>No LMI at 80%</li>
+          <li>Asset protection</li>
+          <li>Major lender — offset available</li>
+          <li>Grandfathered from new trust rules</li>
+        </ul>
+        <ul class="cons">
+          <li>Burns almost all cash ($10K left)</li>
+          <li>No capital for next property</li>
+          <li>No tax benefit until positively geared</li>
+          <li>~$1.5–2K/yr trust admin costs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offset comparison -->
+  <div class="callout">
+    <div class="callout-title">Offset Account Effect — 90% Individual vs 80% Trust</div>
+    <p>With <strong>$58.5K in offset</strong> (Option A), effective loan balance drops to <strong>$378,000</strong> at <strong>6.47%</strong> = $24,457/yr interest.</p>
+    <p>With <strong>$10K in offset</strong> (Option C), effective loan balance is <strong>$378,000</strong> at <strong>6.69%</strong> = $25,288/yr interest.</p>
+    <p>Same effective balance, but Option A costs <strong>$831/yr less</strong> and keeps the cash liquid for the next deal.</p>
+  </div>
+
+  <!-- WHY INDIVIDUAL ON #1 — STRESS-TESTED -->
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 12px;">Why Individual on #1 — Stress-Tested <span class="badge badge-green">Confirmed</span></h3>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    Three structural questions all resolve to "Mai individual on #1": (a) why not all-trust, (b) why not Tim individual on #2 as well, (c) what does Mai's capacity actually look like under each path.
+  </p>
+
+  <!-- Three-way structural comparison -->
+  <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text);">A. Structural comparison — 0 / 1 / 2 individual loans across the portfolio</h4>
+  <table class="portfolio">
     <thead>
-      <tr><th>Factor</th><th>Trust (Discretionary / Family)</th><th>Individual (Joint Tenants / TiC)</th></tr>
+      <tr>
+        <th>Path</th>
+        <th>Mai exposure (50% split)</th>
+        <th>Tim exposure (50% split)</th>
+        <th>Grandfathered PAYG offset captured</th>
+        <th>Verdict</th>
+      </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Asset Protection</td>
-        <td>Assets sit outside personal names — shielded from personal creditors, lawsuits, bankruptcy
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Properties are personal assets — exposed to personal liability, divorce, and creditor claims</td>
+        <td><strong>0 Ind / 10 Trust</strong><br><span style="color: var(--text-muted); font-size: 12px;">McPherson in trust too</span></td>
+        <td>$2.18M</td>
+        <td>$2.18M</td>
+        <td style="color: var(--red);">$0 (forfeited)</td>
+        <td style="color: var(--red);">Pays $50–82K to skip the $34K PAYG + $10K LMI + rate edge benefit. Net loss ~$75–115K over 10 yrs. Distributes capacity evenly but loses cash benefit.</td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>1 Ind (Mai) / 9 Trust</strong> <span class="tag tag-trust" style="margin-left:6px;">Recommended</span></td>
+        <td><strong style="color: var(--amber);">$2.40M</strong></td>
+        <td><strong style="color: var(--green);">$1.97M</strong></td>
+        <td style="color: var(--green);"><strong>$34K captured</strong></td>
+        <td style="color: var(--green);">Captures grandfathered PAYG + LMI waiver + rate edge. Shifts ~$220K of exposure from Tim to Mai — Tim's $530K reserve enables #11/equity release. Mai headroom tight (~$100K).</td>
       </tr>
       <tr>
-        <td>Tax Flexibility</td>
-        <td>Distribute income to any beneficiary each year (adult children, companies, other trusts) — choose the lowest-taxed recipient
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Income split is fixed 50/50 (JT) or per ownership % (TiC) — no year-to-year flexibility</td>
-      </tr>
-      <tr>
-        <td>Negative Gearing</td>
-        <td>Trust losses are trapped inside the trust until it has net income — cannot pass to individuals' taxable income
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Losses offset personal salary/wages immediately — real cashflow benefit in early years</td>
-      </tr>
-      <tr>
-        <td>Land Tax</td>
-        <td>Trusts generally lose the tax-free threshold in most states (NSW, VIC, QLD surcharge or no threshold)
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Each individual gets their own tax-free threshold — significant saving at lower portfolio values</td>
-      </tr>
-      <tr>
-        <td>CGT Discount</td>
-        <td>50% CGT discount available when distributed to individual beneficiaries (hold &gt;12 months)
-          <div class="verdict-tag verdict-draw">Draw</div>
-        </td>
-        <td>50% CGT discount applies directly to each owner</td>
-      </tr>
-      <tr>
-        <td>Estate Planning</td>
-        <td>No probate — trust assets pass outside the will. Change beneficiaries without stamp duty or transfer costs
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Properties pass through the estate — probate fees, potential disputes, stamp duty on transfer to beneficiaries in some states</td>
+        <td><strong>2 Ind (Mai + Tim) / 8 Trust</strong><br><span style="color: var(--text-muted); font-size: 12px;">Tim individual on #2</span></td>
+        <td>$2.18M ($437K ind + 50% × $3.49M trust = $437K + $1.75M)</td>
+        <td>$2.62M ($437K ind + $1.75M trust + ~$10K LMI cost)</td>
+        <td>$34K (only #1 grandfathered; #2 is post-budget)</td>
+        <td style="color: var(--red);">No incremental PAYG benefit on #2 (post-12-May). Tim pays ~$10K LMI (no waiver on 2nd household IP). Pushes Tim over $2.5M placeholder ceiling. Burns reserve for ~22bps rate edge ($854/yr).</td>
       </tr>
     </tbody>
   </table>
-</div>
 
-<!-- DETAILED TAB -->
-<div class="tab-content" id="tab-detailed">
+  <div class="callout" style="border-left-color: var(--purple); margin-top: 12px;">
+    <div class="callout-title" style="color: var(--purple);">The Capacity Trade — Not Free, But Worth It</div>
+    <p>Putting #1 in Mai's individual name shifts <strong>~$220K of exposure off Tim onto Mai</strong> compared to all-trust. Mai's exposure rises from $2.18M (all-trust) to $2.40M (locked); Tim's drops from $2.18M to $1.97M. Total portfolio debt is identical at $4.37M — the structure just decides who carries it.</p>
+    <p>This is a <strong>concentrated trade</strong>, not a free option. We're spending $220K of Mai's headroom (cutting her buffer from $320K to $100K against the placeholder $2.5M ceiling) to buy three things:</p>
+    <p style="margin-top: 8px;">• <strong>$34K of grandfathered PAYG offset</strong> (real cash, only available because #1 contract pre-dates the budget)</p>
+    <p>• <strong>$10K LMI waiver + rate edge</strong> on this loan</p>
+    <p>• <strong>$530K of Tim's reserve capacity</strong> — enough for an 11th deal, an equity-release event, or an emergency buffer</p>
+    <p style="margin-top: 8px;">The trade-off is asymmetric in our favour: ~$55K of locked-in cash benefit + the optionality of Tim's reserve, in exchange for tightening the limiting party (Mai) by $220K within a ceiling that still completes the plan. The earlier "Mai's capacity is invariant" framing was wrong — the correct framing is that the cost is real but small relative to the benefits.</p>
+  </div>
 
-  <table class="comp-table">
+  <!-- PAYG offset year-by-year -->
+  <h4 style="font-size: 14px; margin-top: 24px; margin-bottom: 8px; color: var(--text);">B. The grandfathered PAYG benefit, year by year</h4>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+    The $25–35K headline is real cash, not theoretical. Modelled on Option A (Mai 90% IO @ 6.47%), $470/wk rent growing 3% p.a., property turns positive around year 6–7.
+  </p>
+  <table class="portfolio">
     <thead>
-      <tr><th>Factor</th><th>Trust</th><th>Individual</th></tr>
+      <tr>
+        <th>Year</th>
+        <th>Annual rent</th>
+        <th>Annual interest + costs</th>
+        <th>Pre-tax shortfall</th>
+        <th>Tax benefit @ 45%</th>
+        <th>Cumulative cash benefit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>$24,440</td><td>~$36,003</td><td style="color: var(--red);">−$11,563</td><td style="color: var(--green);">$5,203</td><td>$5,203</td></tr>
+      <tr><td>2</td><td>$25,173</td><td>~$36,200</td><td style="color: var(--red);">−$11,027</td><td style="color: var(--green);">$4,962</td><td>$10,165</td></tr>
+      <tr><td>3</td><td>$25,928</td><td>~$36,400</td><td style="color: var(--red);">−$10,472</td><td style="color: var(--green);">$4,712</td><td>$14,877</td></tr>
+      <tr><td>4</td><td>$26,706</td><td>~$36,600</td><td style="color: var(--red);">−$9,894</td><td style="color: var(--green);">$4,452</td><td>$19,329</td></tr>
+      <tr><td>5</td><td>$27,507</td><td>~$36,800</td><td style="color: var(--red);">−$9,293</td><td style="color: var(--green);">$4,182</td><td>$23,511</td></tr>
+      <tr><td>6</td><td>$28,332</td><td>~$37,000</td><td style="color: var(--red);">−$8,668</td><td style="color: var(--green);">$3,901</td><td>$27,412</td></tr>
+      <tr><td>7</td><td>$29,182</td><td>~$37,200</td><td style="color: var(--red);">−$8,018</td><td style="color: var(--green);">$3,608</td><td>$31,020</td></tr>
+      <tr class="highlight"><td><strong>8</strong></td><td>$30,058</td><td>~$37,400</td><td style="color: var(--amber);">−$7,342</td><td style="color: var(--green);">$3,304</td><td><strong style="color: var(--green);">$34,324</strong></td></tr>
+      <tr><td>9+</td><td colspan="4" style="color: var(--text-muted); font-style: italic;">Property approaches break-even; further benefit small. Refinance equity becomes the focus.</td><td style="color: var(--text-muted);">~$35K total</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+    Total grandfathered PAYG offset captured: <strong style="color: var(--green);">~$34K over 8 years</strong>. Add $10K LMI waiver + ~$10–15K rate-and-offset edge = <strong>~$55K of locked benefit</strong> that vanishes if #1 goes into trust.
+  </p>
+
+  <h4 style="font-size: 14px; margin-top: 24px; margin-bottom: 8px; color: var(--text);">C. Switching cost — what putting #1 in trust would actually cost</h4>
+
+  <table class="portfolio">
+    <thead>
+      <tr>
+        <th>Switching cost component</th>
+        <th>Calculation</th>
+        <th style="text-align: right;">Cost over 10 yrs</th>
+      </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Setup Complexity</td>
-        <td>Need trust deed, TFN, ABN, bank account. Ongoing: annual tax return, minutes, distribution resolutions.
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Buy in personal names — minimal paperwork beyond the purchase itself.</td>
+        <td><strong>Lost grandfathered PAYG offset</strong></td>
+        <td>~$11.5K annual shortfall × 45% marginal tax = $5.2K/yr saved.<br>Available for ~5–7 years until property turns positive.</td>
+        <td style="text-align: right; color: var(--red);">$25,000 – $35,000</td>
       </tr>
       <tr>
-        <td>Lending / Serviceability</td>
-        <td>Banks assess trust lending more conservatively. Some lenders won't lend to trusts at all. Guarantor structures get complicated. Maximum LVR sometimes capped at 80%.
-          <div class="verdict-tag verdict-risk">Caution</div>
-        </td>
-        <td>Standard residential lending. 90%+ LVR available. Simpler broker conversations. PAYG income directly counted.</td>
+        <td><strong>LMI not waived for trust</strong></td>
+        <td>Tim's professional waiver applies to individual loans only.<br>~$10K LMI at 90% LVR through trust.<br>(Or skip via 80% LVR — but that locks up an extra $48.5K cash; modelled as opportunity cost below.)</td>
+        <td style="text-align: right; color: var(--red);">$10,000</td>
       </tr>
       <tr>
-        <td>Income Distribution</td>
-        <td>Trustee resolves distribution annually before 30 June. Can stream capital gains and franked dividends separately. Full flexibility across all beneficiaries in the trust deed.
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Fixed by ownership structure. Cannot change without transferring ownership (triggering stamp duty + CGT).</td>
+        <td><strong>Rate premium</strong></td>
+        <td>22–62bps over the individual rate × $436K loan = $960–$2,700/yr.<br>Compounds over the loan life.</td>
+        <td style="text-align: right; color: var(--red);">$10,000 – $27,000</td>
       </tr>
       <tr>
-        <td>Stamp Duty on Purchase</td>
-        <td>Same stamp duty on acquisition. But changing trustee or vesting can trigger additional duty in some states.
-          <div class="verdict-tag verdict-draw">Draw</div>
-        </td>
-        <td>Standard stamp duty. Changing ownership share (TiC) triggers additional duty.</td>
+        <td><strong>Trust admin overhead</strong></td>
+        <td>~$1.5–2K/yr (ASIC, accounting, tax return for the property).<br>Marginal cost only — Apricot exists either way, but each property in it adds to the bookkeeping.</td>
+        <td style="text-align: right; color: var(--red);">$5,000 – $10,000</td>
       </tr>
-      <tr>
-        <td>PPOR Exemption</td>
-        <td>Trust CANNOT access the main residence CGT exemption — ever.
-          <div class="verdict-tag verdict-risk">Trust risk</div>
-        </td>
-        <td>Full main residence exemption available if one owner lives in it.</td>
-      </tr>
-      <tr>
-        <td>Family Law (Divorce)</td>
-        <td>Trust assets are harder to divide but NOT immune — family court can "look through" trusts. Still provides a structural barrier and negotiation complexity.
-          <div class="verdict-tag verdict-trust">Trust advantage</div>
-        </td>
-        <td>Properties are directly in the asset pool — split per court orders with no structural barriers.</td>
-      </tr>
-      <tr>
-        <td>Succession on Death</td>
-        <td>Trust continues. No stamp duty on death. Appointor/guardian roles transfer per deed. No probate delay.
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>JT: surviving owner gets it automatically. TiC: goes through estate/will — probate, potential challenges, stamp duty in some states.</td>
-      </tr>
-      <tr>
-        <td>Trust Vesting</td>
-        <td>Trusts have a vesting date (usually 80 years from creation). At vesting, all assets are distributed — potential CGT + stamp duty event.
-          <div class="verdict-tag verdict-risk">Trust risk</div>
-        </td>
-        <td>No equivalent time limit.</td>
-      </tr>
-      <tr>
-        <td>Privacy</td>
-        <td>Ownership not directly searchable by name (trustee entity, often a company, appears on title). Trust deed is private.
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Names appear on title search — publicly discoverable.</td>
-      </tr>
-      <tr>
-        <td>Multiple Properties</td>
-        <td>All properties under one entity — simpler portfolio management, one tax return, one bank relationship.
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Each property is an asset of the individuals — scales fine but no structural separation between properties.</td>
+      <tr style="background: rgba(248,113,113,0.08);">
+        <td><strong>Total switching cost</strong></td>
+        <td>One-time + recurring, before any benefit recapture</td>
+        <td style="text-align: right; color: var(--red); font-weight: 700; font-size: 15px;">$50,000 – $82,000</td>
       </tr>
     </tbody>
   </table>
+
+  <div class="comparison-grid" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+    <div class="option-card">
+      <div class="option-title" style="color: var(--green);">Benefits we'd be paying for</div>
+      <ul class="pros" style="list-style: none; font-size: 13px; margin-top: 8px;">
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--green); font-weight: 700;">+</span><strong>Asset protection</strong> on this single property</li>
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--green); font-weight: 700;">+</span><strong>Distribution flexibility</strong> on this property's eventual positive cashflow</li>
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--green); font-weight: 700;">+</span><strong>Grandfathered trust losses</strong> — could pool against future trust property income (limited use; #2–10 also generate trust losses)</li>
+      </ul>
+    </div>
+
+    <div class="option-card recommended">
+      <div class="option-title" style="color: var(--accent);">Why those benefits don't justify the cost</div>
+      <ul class="cons" style="list-style: none; font-size: 13px; margin-top: 8px;">
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--red); font-weight: 700;">−</span><strong>Mai's lawsuit risk is minimal</strong> — in-house counsel, no private clients, no PI exposure on individual files, employer indemnity covers her work</li>
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--red); font-weight: 700;">−</span><strong>Distribution flexibility is dying</strong> — 30% min trust tax from 1 Jul 2028 kills splitting to low-income beneficiaries; T+M both at 45% marginal anyway</li>
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--red); font-weight: 700;">−</span><strong>Mai's capacity isn't actually consumed</strong> by individual #1 — under 50% split she ends at $2.18M either way (individual + 9 trust @ 50% = all 10 trust @ 50%)</li>
+        <li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0; color: var(--red); font-weight: 700;">−</span><strong>Only one property is exposed</strong> — #2–10 are all trust regardless. Asset protection on the whole portfolio costs nothing extra</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">Decision Confirmed</div>
+    <p>Pay <strong>$50–82K</strong> to put #1 in trust → buy asset protection on a single property and distribution flexibility that's mostly being legislated away.</p>
+    <p>Or stay individual → capture <strong>$25–35K</strong> of grandfathered PAYG offset that no future deal will ever access, plus a $10K LMI waiver, plus a lower rate, with no impact on trust capacity from #2 onwards.</p>
+    <p><strong>Net: individual on #1 is ~$75–115K better over 10 years</strong> than the alternative, and the asset-protection downside is materially mitigated by Mai's employment structure. Locked.</p>
+  </div>
 </div>
 
-<!-- TAX DEEP-DIVE TAB -->
-<div class="tab-content" id="tab-tax">
+<!-- BUDGET CHANGES -->
+<div class="section">
+  <h2>2026–27 Federal Budget Changes <span class="badge badge-amber">12 May 2026</span></h2>
 
   <div class="callout">
-    <strong>The negative gearing trade-off</strong>
-    In early years with high interest costs and low rent, properties often run at a loss. Individuals claim that loss against salary immediately. A trust traps the loss — it carries forward until the trust is net positive. This is the #1 reason some investors stay in personal names early, then consider a trust once the portfolio is cashflow-positive.
+    <div class="callout-title">1. Negative Gearing Quarantine (from 1 July 2027)</div>
+    <p>Properties bought <strong>after 7:30pm 12 May 2026</strong>: rental losses on existing residential properties are <strong>quarantined</strong> — they can only offset other residential property income (including capital gains), not PAYG salary.</p>
+    <p>Applies to <strong>individuals, partnerships, companies AND trusts</strong>. New builds exempt.</p>
+    <p><strong>McPherson is grandfathered</strong> (contract 7 May). All future existing-dwelling purchases are affected.</p>
   </div>
 
-  <table class="comp-table">
+  <div class="callout">
+    <div class="callout-title">2. 30% Minimum Tax on Discretionary Trusts (from 1 July 2028)</div>
+    <p>Trustees pay <strong>30% minimum tax</strong> on trust taxable income. Beneficiaries get a non-refundable credit.</p>
+    <p><strong>Impact on Tim &amp; Mai:</strong> Both on 45% marginal rate — the 30% minimum is <strong>below</strong> your marginal rate, so <strong>no extra tax</strong>. The credit covers the 30% and you top up to 45% on your personal return.</p>
+    <p><strong>What it kills:</strong> income splitting to low-income beneficiaries (&lt;$45K income). Streaming to kids or non-working family members no longer saves tax.</p>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">What This Means for Future Properties</div>
+    <p>The main advantage of individual ownership (negative gearing against salary) is <strong>gone for all future purchases</strong>. This <strong>levels the playing field</strong> between individual and trust — the trust's structural benefits (asset protection, distribution flexibility) now come at a lower relative cost.</p>
+  </div>
+</div>
+
+<!-- STRATEGIC PRIORITY & CAPITAL CADENCE -->
+<div class="section">
+  <h2>Strategic Priority &amp; Capital Cadence <span class="badge badge-purple">Decision Frame</span></h2>
+
+  <div class="callout" style="border-left-color: var(--purple);">
+    <div class="callout-title" style="color: var(--purple);">Priority: Maximise Portfolio Scale, Not Minimise Per-Property Holding Cost</div>
+    <p>The structure decision is made under a <strong>scale-first</strong> priority. A ~$7.7K/yr holding-cost difference on a single property is acceptable if it preserves the borrowing runway to acquire more. A structure that minimises holding cost but caps the portfolio at 4–5 properties is the worse outcome.</p>
+    <p>This <strong>flips the default trade-off</strong>: where the doc earlier described the trust premium as "the price of preserving borrowing runway," that price is now what we are explicitly willing to pay.</p>
+  </div>
+
+  <h3 style="font-size: 15px; margin-bottom: 12px;">Capital Cadence — 2026 Funding Rhythm</h3>
+  <div class="key-facts" style="margin-bottom: 16px;">
+    <div class="fact">
+      <div class="fact-label">Now (Pre-McPherson)</div>
+      <div class="fact-value">$135K</div>
+    </div>
+    <div class="fact">
+      <div class="fact-label">After McPherson (Opt A)</div>
+      <div class="fact-value">$58.5K</div>
+    </div>
+    <div class="fact">
+      <div class="fact-label">July 2026 Inflow</div>
+      <div class="fact-value pos">+$150K</div>
+    </div>
+    <div class="fact">
+      <div class="fact-label">October 2026 Inflow</div>
+      <div class="fact-value pos">+$100K</div>
+    </div>
+    <div class="fact">
+      <div class="fact-label">EOY 2026 Position</div>
+      <div class="fact-value">~$308K</div>
+    </div>
+    <div class="fact">
+      <div class="fact-label">Implied Deal Headroom</div>
+      <div class="fact-value">~2 more</div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">Binding Constraint = Lender Capacity, Not Cash</div>
+    <p>With ~$308K available by year-end, deposit + stamp duty + costs (~$77K per $485K purchase at 90% LVR) is well-covered for two additional acquisitions. The question is not "do we have the cash" — it's <strong>"do we still have borrowing capacity available."</strong></p>
+    <p>This makes the <strong>50%-guarantor-split question</strong> (next section) the single highest-leverage variable in the whole strategy.</p>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">Trust Already Established — Apricot Apricot Family Trust</div>
+    <p>The <strong>Apricot Apricot Family Trust</strong> is already set up and ready to deploy. The 4–6 week setup lead time that constrains most PK community members <strong>does not apply here</strong> — trust acquisitions can run on the same timeline as individual ones.</p>
+    <p>This removes a major scheduling constraint from the plan: if Fork 1 resolves to "no LMI waiver for Tim," <strong>property #2 can go straight into the trust in August 2026</strong> alongside the $150K inflow, with no setup delay.</p>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">Property #2 — Decision Locked: Apricot Family Trust @ 80% LVR (Aug 2026)</div>
+    <p>Jenny confirmed on <strong>16 May 2026</strong> that Tim does <strong>not</strong> get an LMI waiver on a 2nd household IP when Mai already holds #1. That removes the only meaningful one-time advantage individual ownership had on #2.</p>
+    <p>With LMI waiver off the table and neg gearing quarantined post-12-May regardless of structure, the residual case for Tim individual on #2 is just a ~22bps rate edge (~$854/yr). That's not worth burning Tim's full personal capacity. <strong>Trust @ 80% wins on capacity preservation + asset protection + distribution flexibility</strong>, and Apricot is already established with no setup gate.</p>
+  </div>
+</div>
+
+<!-- BORROWING CAPACITY -->
+<div class="section">
+  <h2>Borrowing Capacity — The Portfolio Scale Question <span class="badge badge-purple">Key Consideration</span></h2>
+
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+    If the priority is <strong>maximising the number of properties</strong> rather than minimising holding costs on any single deal, the structure decision changes significantly.
+  </p>
+
+  <div class="comparison-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="option-card">
+      <div class="option-title" style="color: var(--accent);">Individual — How It Limits Scale</div>
+      <div class="option-row"><span class="label">Debt attribution</span><span class="value bad">100% on borrower</span></div>
+      <div class="option-row"><span class="label">Mai's capacity used</span><span class="value bad">$436.5K (full loan)</span></div>
+      <div class="option-row"><span class="label">Tim's capacity used</span><span class="value good">$0</span></div>
+      <div class="option-row"><span class="label">After property #2 (Tim)</span><span class="value bad">Both tapped</span></div>
+      <div class="option-row"><span class="label">Property #3 pathway</span><span class="value bad">Need capacity to free up</span></div>
+      <div style="margin-top: 16px; font-size: 13px; color: var(--text-muted); padding: 12px; background: var(--card-alt); border-radius: 8px;">
+        Each individual loan sits <strong>100% on that person's balance sheet</strong>. After Mai takes #1 and Tim takes #2, both personal borrowing capacities are significantly reduced. Getting to property #3 requires either salary increases, existing properties turning positive, or waiting for equity growth.
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-title" style="color: var(--purple);">Trust — How It Helps Scale</div>
+      <div class="option-row"><span class="label">Debt attribution</span><span class="value good">Split across guarantors</span></div>
+      <div class="option-row"><span class="label">Mai's capacity used</span><span class="value good">~$218K (50%)</span></div>
+      <div class="option-row"><span class="label">Tim's capacity used</span><span class="value good">~$218K (50%)</span></div>
+      <div class="option-row"><span class="label">After property #2 (trust)</span><span class="value good">Both have headroom</span></div>
+      <div class="option-row"><span class="label">Property #3 pathway</span><span class="value good">Capacity preserved</span></div>
+      <div style="margin-top: 16px; font-size: 13px; color: var(--text-muted); padding: 12px; background: var(--card-alt); border-radius: 8px;">
+        <strong>Some lenders only count 50% of trust debt against each guarantor</strong> when both Tim and Mai guarantee. A $436.5K trust loan may only show as $218K against each person's serviceability — effectively doubling the number of properties you can acquire before hitting capacity limits. <strong>Confirm with Jenny: how do specific lenders treat guarantor exposure on trust loans?</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--purple);">
+    <div class="callout-title" style="color: var(--purple);">The Real Trade-Off for McPherson — Resolved by Grandfathering</div>
+    <p>Individual saves ~<strong>$7.7K/yr</strong> on this property ($2.7K interest + $5K tax benefit) but consumes Mai's <strong>full $436.5K personal capacity</strong>. Under a pure scale-first priority, that capacity cost would normally favour trust.</p>
+    <p><strong>McPherson is the exception:</strong> the grandfathered neg-gearing-vs-PAYG offset is a <strong>one-time, never-repeatable</strong> benefit. Every subsequent property (#2 onwards) loses this — losses are quarantined to property income regardless of structure. So #1 is the only deal where the individual-name argument is strictly stronger than the trust argument.</p>
+    <p><strong>Conclusion: Option A on #1, then pivot to capacity-preserving structures from #2.</strong> The cost of using Mai's capacity here is the entry ticket to a benefit that won't exist again.</p>
+  </div>
+
+  <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+    <h3 style="font-size: 15px; margin-bottom: 12px;">Cumulative Borrowing Capacity Impact — 10 Properties</h3>
+    <table class="portfolio">
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>Mai's Debt Exposure</th>
+          <th>Tim's Debt Exposure</th>
+          <th>Total Portfolio Debt</th>
+          <th>Capacity Bottleneck</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>All Individual</strong> (alternating)</td>
+          <td style="color: var(--red);">$2.18M (5 × $436K)</td>
+          <td style="color: var(--red);">$2.18M (5 × $436K)</td>
+          <td>$4.37M</td>
+          <td style="color: var(--red);">Hit wall at ~property #3–4</td>
+        </tr>
+        <tr>
+          <td><strong>2 Individual + 8 Trust</strong> (50% split)</td>
+          <td style="color: var(--amber);">$436K + $1.55M (50%) = $1.99M</td>
+          <td style="color: var(--amber);">$436K + $1.55M (50%) = $1.99M</td>
+          <td>$4.25M</td>
+          <td style="color: var(--amber);">More runway, wall at ~#6–7</td>
+        </tr>
+        <tr>
+          <td><strong>All Trust</strong> (50% split)</td>
+          <td style="color: var(--amber);">$2.18M (50% of $4.37M)</td>
+          <td style="color: var(--amber);">$2.18M (50% of $4.37M)</td>
+          <td>$4.37M</td>
+          <td style="color: var(--amber);">Equal exposure both sides — but forfeits $34K grandfathered PAYG, $10K LMI waiver, and the rate edge on #1. No PAYG = strictly more expensive over 10 yrs.</td>
+        </tr>
+        <tr class="highlight">
+          <td><strong>1 Individual (Mai) + 9 Trust</strong> <span class="tag tag-trust" style="margin-left:6px;">Recommended</span></td>
+          <td style="color: var(--amber);">$437K + $1.97M (50%) = $2.40M</td>
+          <td style="color: var(--green);">$1.97M (50% of $3.93M)</td>
+          <td>$4.37M</td>
+          <td style="color: var(--green);"><strong>Optimal.</strong> Shifts ~$220K of exposure from Tim to Mai. Buys: $34K PAYG + $10K LMI + rate edge + $530K Tim reserve for deal #11/equity release/emergency buffer. Mai's headroom tight (~$100K) but plan completes within ceiling.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+      * 50% guarantor split is lender-dependent — not all lenders assess this way. This is the key question for Jenny.
+    </p>
+  </div>
+
+  <!-- LOCKED PLAN: 50% split path -->
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 4px;">Locked Plan Under 50%-Split Lender</h3>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    1 individual Mai + 9 trust, ~$437K avg loan, T+M co-guarantors, written through a 50%-split lender (Macquarie / Liberty / Pepper / Firstmac / Adelaide / Bankwest).
+  </p>
+
+  <div class="option-card recommended" style="max-width: 640px;">
+    <div class="option-title" style="color: var(--green);">Capacity at property #10</div>
+    <div class="option-row"><span class="label">Mai's exposure</span><span class="value good">$2.40M</span></div>
+    <div class="option-row"><span class="label">  → $437K individual + 50% × $3.93M trust</span><span class="value" style="font-size: 11px; color: var(--text-muted);">$437K + $1.97M</span></div>
+    <div class="option-row"><span class="label">Tim's exposure</span><span class="value good">$1.97M</span></div>
+    <div class="option-row"><span class="label">  → 50% × $3.93M trust only</span><span class="value" style="font-size: 11px; color: var(--text-muted);">$1.97M</span></div>
+    <div class="option-row"><span class="label">Total portfolio debt</span><span class="value">$4.37M</span></div>
+    <div class="option-row"><span class="label">Mai's headroom (vs $2.5M ceiling)</span><span class="value neutral">~$100K (tight — no buffer)</span></div>
+    <div class="option-row"><span class="label">Tim's headroom (vs $2.5M ceiling)</span><span class="value good">~$530K (1–2 more deals)</span></div>
+    <div class="total-row">
+      <span class="label">Plan viability</span>
+      <span class="value pos">10 properties achievable</span>
+    </div>
+    <div style="margin-top: 14px; font-size: 13px; color: var(--text-muted);">
+      Mai is the limiting party — by #10 she's at $2.40M with only ~$100K of headroom against the placeholder $2.5M ceiling. Tim retains ~$530K reserve, which is the locked plan's structural advantage over all-trust: deal #11, equity-release capacity, and an emergency buffer all sit in Tim's name.
+    </div>
+  </div>
+
+  <p style="font-size: 12px; color: var(--text-muted); margin-top: 16px; padding: 10px 14px; border-left: 2px solid var(--red); background: rgba(248,113,113,0.04); border-radius: 0 4px 4px 0;">
+    <strong style="color: var(--red);">Footnote — what we're avoiding:</strong> if a Big-4 / 100%-attribution lender wrote the trust loans instead, Mai would land at $4.37M ($437K individual + 100% × $3.93M trust) and Tim at $3.93M against $2.5M ceilings. Plan caps at ~5–6 properties. The candidate shortlist below exists specifically to make sure this doesn't happen by accident — it's not a competing path.
+  </p>
+
+  <!-- MULTI-LENDER REQUIREMENT -->
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 4px;">Multi-Lender by Necessity, Not Choice</h3>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    The locked plan cannot be executed through a single lender. Three independent reasons force a 2–3 lender rotation across the portfolio.
+  </p>
+
+  <div class="comparison-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="option-card">
+      <div class="option-title" style="color: var(--accent);">1. Per-lender exposure caps</div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+        <p style="margin-bottom: 8px;">Most second-tier lenders cap total exposure to one borrower at ~$3–5M. The locked plan totals <strong>$4.37M of debt</strong> — well into the cap zone for Macquarie/Firstmac and likely <em>over</em> for Liberty/Pepper.</p>
+        <p>Even if Macquarie wrote everything from a policy standpoint, they'd cut you off before #10.</p>
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-title" style="color: var(--purple);">2. Servicing buffers compound against you</div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+        <p style="margin-bottom: 8px;">Each lender assesses their own existing loans at <strong>their own inflated buffer rate</strong> (typically actual + 3%). Stay with one lender → every new application uses the inflated rate against all your prior loans with them.</p>
+        <p>A different lender often assesses your <em>existing</em> loans at actual repayment level (or close to it), unlocking servicing capacity that Macquarie's own calculator says you don't have.</p>
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-title" style="color: var(--green);">3. Concentration risk</div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+        <p style="margin-bottom: 8px;">10 properties through one lender = single point of failure. Policy change, valuation dispute, or relationship breakdown affects the whole portfolio simultaneously.</p>
+        <p>2–3 lenders means a Macquarie tightening doesn't freeze acquisitions or refinances — Firstmac/Liberty fill the gap.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--accent);">
+    <div class="callout-title" style="color: var(--accent);">Practical Rotation</div>
+    <p><strong>Target: 2–3 lenders across the 9 trust loans.</strong> The Tier 1 → Tier 2 → Tier 3 progression below isn't a fallback list — it's the actual deployment sequence:</p>
+    <p style="margin-top: 8px;">• <strong>Macquarie</strong> writes #2–#4 (~$1.3M against Macquarie's exposure cap)</p>
+    <p>• <strong>Firstmac</strong> writes #5–#7 (~$1.3M against a fresh ceiling, with Macquarie's existing debt assessed at actual rates)</p>
+    <p>• <strong>Liberty</strong> or <strong>Pepper</strong> writes #8–#10 (rate premium accepted; specialist servicing flexibility unlocks the back half)</p>
+    <p style="margin-top: 8px;">Cross-collateralisation stays off — every property is standalone security against its specific loan, regardless of which lender wrote it.</p>
+  </div>
+
+  <!-- RANKED LENDER PRIORITY -->
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 4px;">Lender Priority Order <span class="badge badge-amber">Validate with broker</span></h3>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    Within the 50%-split shortlist, lenders are not equivalent. Ranked by the criteria that matter for a stacked trust portfolio: rate, offset, repeat-deal appetite, and trust-policy stability. The ranking doubles as the deployment sequence — top of list = open with this; lower tiers = next in rotation as exposure caps approach.
+  </p>
+
+  <table class="portfolio">
     <thead>
-      <tr><th>Tax Aspect</th><th>Trust</th><th>Individual</th></tr>
+      <tr>
+        <th>Rank</th>
+        <th>Lender</th>
+        <th>Why this position</th>
+        <th>Best for</th>
+      </tr>
     </thead>
     <tbody>
+      <tr class="section-header"><td colspan="4">Tier 1 — Lead candidate (open with this)</td></tr>
+      <tr class="highlight">
+        <td><strong style="font-size: 16px; color: var(--green);">1</strong></td>
+        <td><strong>Macquarie</strong></td>
+        <td>Sharpest rates of the 50%-split set (typically within 10–30bps of Big-4). Full offset on IO. Clean guarantor-count split written into policy, not case-by-case. Strong appetite for property investors building portfolios. Trust treatment among the most predictable in the market.</td>
+        <td><strong>#2, #3, #4.</strong> Open the trust portfolio here. Ride them as far as their exposure cap allows (typically $3–5M).</td>
+      </tr>
+      <tr class="section-header"><td colspan="4">Tier 2 — Strong second (deploy when Tier 1 caps or rate moves against)</td></tr>
       <tr>
-        <td>Marginal Tax Rate Optimisation</td>
-        <td>Distribute to lowest-taxed beneficiary. If Mum earns $40k and Dad earns $180k, all rental income goes to Mum. Next year, distribute to adult child earning $0.
-          <div class="verdict-tag verdict-trust">Major advantage</div>
-        </td>
-        <td>Locked to ownership split. If 50/50, high-earner pays top rate on their half.</td>
+        <td><strong style="font-size: 16px; color: var(--accent);">2</strong></td>
+        <td><strong>Firstmac</strong></td>
+        <td>Non-bank with the most competitive rates after Macquarie. Trust policy is well-documented and pro-rata. Offset available on IO. Less brand recognition but operationally clean.</td>
+        <td><strong>#4–#6.</strong> Natural successor when Macquarie hits exposure ceiling; rate gap is small enough not to hurt.</td>
+      </tr>
+      <tr class="section-header"><td colspan="4">Tier 3 — Fallback (rate premium accepted to keep capacity flowing)</td></tr>
+      <tr>
+        <td><strong style="font-size: 16px; color: var(--amber);">3</strong></td>
+        <td><strong>Liberty</strong></td>
+        <td>Specialist non-bank with the most flexible serviceability assessment of the set. Rates carry a 50–100bps premium. Pro-rata by guarantor is consistent. Useful when servicing tightens at mainstream lenders.</td>
+        <td><strong>#6–#8.</strong> When mainstream calculators start saying "no", Liberty often still says "yes" — pay the rate premium for continued capacity.</td>
       </tr>
       <tr>
-        <td>Rental Losses (Neg Gearing)</td>
-        <td>Trapped in trust. Carried forward. Only offset future trust income.
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Offset against salary/wages immediately. Tax refund in hand.</td>
+        <td><strong style="font-size: 16px; color: var(--amber);">4</strong></td>
+        <td><strong>Pepper</strong></td>
+        <td>Similar profile to Liberty — specialist, flexible, rate premium. Case-by-case rather than policy-driven, so deal terms vary more. Strong for non-vanilla scenarios.</td>
+        <td><strong>#6–#8.</strong> Use as Liberty alternative if Pepper's pricing on the day is sharper, or if Liberty has tightened.</td>
+      </tr>
+      <tr class="section-header"><td colspan="4">Tier 4 — Situational (only if upstream options exhausted)</td></tr>
+      <tr>
+        <td><strong style="font-size: 16px; color: var(--text-muted);">5</strong></td>
+        <td><strong>Adelaide Bank</strong></td>
+        <td>Bendigo-owned. Decent rates but more conservative on trust serviceability than Macquarie. Pro-rata in some scenarios but not as clean a policy. Repeat-deal appetite mixed.</td>
+        <td><strong>Last 1–2 deals.</strong> Worth a calculator run, not a default choice.</td>
       </tr>
       <tr>
-        <td>Capital Gains on Sale</td>
-        <td>Trust distributes capital gain to chosen beneficiary. 50% discount available if distributed to individuals. Can split gains across multiple beneficiaries.
-          <div class="verdict-tag verdict-trust">Trust wins</div>
-        </td>
-        <td>Gain taxed per ownership share. 50% discount per individual. No ability to redirect gains.</td>
+        <td><strong style="font-size: 16px; color: var(--text-muted);">6</strong></td>
+        <td><strong>Bankwest</strong></td>
+        <td>CBA-owned. Pricing closer to Big-4. Trust pro-rata historically — but policy has tightened in recent years and they're now more selective. Less differentiated from the parent group.</td>
+        <td><strong>Skip unless rate is materially better on the day.</strong> Treat as last-resort, re-validate policy before using.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="border-left-color: var(--green);">
+    <div class="callout-title" style="color: var(--green);">Recommended Opening Move</div>
+    <p><strong>Lead with Macquarie for #2.</strong> Best rate-to-policy combination, most predictable trust treatment, strong repeat appetite. Plan to ride Macquarie through #2–#4, monitor their exposure cap, then pivot to Firstmac for #4–#6 and Liberty/Pepper for the back half of the portfolio.</p>
+    <p style="margin-top: 8px;">This sequencing matters — switching lenders too late (when servicing has already tightened) costs more than switching early. The broker brief should include "<em>which 2 lenders do we line up after Macquarie before we hit their cap</em>", not just "<em>who writes #2</em>".</p>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--amber);">
+    <div class="callout-title">Caveats Before Acting on This Ranking</div>
+    <p>• This ranking reflects general industry positioning, not live mid-2026 broker data — Jenny / her successor must validate before #2 finance application</p>
+    <p>• Policies change quarterly; a Tier 1 lender today can drop tiers overnight (Bankwest is the cautionary tale)</p>
+    <p>• "Pro-rata" often requires the trust to be <strong>demonstrably self-supporting</strong> — early-portfolio constraint that bites before #2's rent stabilises</p>
+    <p>• Some lenders split only if the <em>other</em> guarantor isn't also applying with them on a different deal — relevant once portfolio is spread</p>
+    <p>• Trust structure (discretionary vs unit), guarantor relationship, and actual income distribution patterns all shift treatment</p>
+  </div>
+</div>
+
+<!-- 10-PROPERTY PORTFOLIO -->
+<div class="section">
+  <h2>10-Property Portfolio — Dated Cadence</h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    Base-case cadence assuming ~$485K avg purchase, 90% LVR individual (with LMI waiver) / 80% LVR trust, per-deal cash ~$77K (individual) or ~$125K (trust @ 80%). Year 1 acquisitions land on capital inflows; from #4 onwards equity recycling drives deal flow. Properties #2–10 fall under post-12-May tax rules (neg gearing quarantined regardless of structure).
+  </p>
+
+  <table class="portfolio">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>When</th>
+        <th>Structure</th>
+        <th>Buyer / Entity</th>
+        <th>LVR</th>
+        <th>Funding Source</th>
+        <th>Rationale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="section-header"><td colspan="7">Year 1 — Active capital deployment (3 deals from inflows)</td></tr>
+      <tr class="highlight">
+        <td><strong>1</strong></td>
+        <td>May 2026</td>
+        <td><span class="tag tag-individual">Individual</span></td>
+        <td>Mai Campbell</td>
+        <td>90%</td>
+        <td>$135K current cash</td>
+        <td>Grandfathered neg-gearing-vs-PAYG — <strong>one-time only</strong></td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>2</strong></td>
+        <td>Aug 2026</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust (T+M guarantors)</td>
+        <td>80%</td>
+        <td>$150K July inflow</td>
+        <td><strong>Fork 1 resolved (Jenny confirmed 16 May): Tim does not get LMI waiver on 2nd household IP.</strong> Individual loses its one-time advantage → trust wins on capacity preservation + asset protection</td>
       </tr>
       <tr>
-        <td>Land Tax (NSW)</td>
-        <td>Fixed trusts: $100 + 1.6% (over $100). Non-fixed: surcharge rate of 2% applies on top. No $1.075M threshold for non-fixed trusts (2024-25 rates).
-          <div class="verdict-tag verdict-risk">Trust penalty</div>
-        </td>
-        <td>Each individual: tax-free threshold $1,075,000 (2024-25). Combined couple effectively $2.15M before any land tax.</td>
+        <td><strong>3</strong></td>
+        <td>Nov 2026</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Apricot Family Trust (T+M guarantors)</td>
+        <td>80%</td>
+        <td>$100K October inflow + residual cash</td>
+        <td>October inflow funds the trust 80% deposit; capacity-preservation runway begins</td>
+      </tr>
+
+      <tr class="section-header"><td colspan="7">Years 2–4 — Equity recycling drives deal flow</td></tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Q2 2027</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity release from #1 + savings</td>
+        <td>McPherson hits 12-month refinance window; first equity drawdown</td>
       </tr>
       <tr>
-        <td>Land Tax (VIC)</td>
-        <td>Trusts lose the general threshold ($50k surcharge threshold in 2024). Trust surcharge of 0.375% applies.
-          <div class="verdict-tag verdict-risk">Trust penalty</div>
-        </td>
-        <td>Individual threshold $300k (2024). Each person gets their own.</td>
+        <td><strong>5</strong></td>
+        <td>Q4 2027</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity release from #2 + portfolio cashflow</td>
+        <td>Property #2 hits refinance window; cashflow from #1–3 contributes</td>
       </tr>
       <tr>
-        <td>Land Tax (QLD)</td>
-        <td>Trusts get $350k threshold but pay surcharge of 0.5% on total taxable value over $350k (2024-25).
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Individual threshold $600k each (2024-25). No surcharge.</td>
+        <td><strong>6</strong></td>
+        <td>Q2 2028</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity release from #3 + cashflow</td>
+        <td>First trust property refinances; trust portfolio starts self-funding</td>
       </tr>
       <tr>
-        <td>Depreciation</td>
-        <td>Claimed at trust level. Offsets trust income only (compounds the loss-trapping problem in early years).
-          <div class="verdict-tag verdict-individual">Individual wins</div>
-        </td>
-        <td>Claimed personally — directly reduces taxable income alongside rental loss.</td>
+        <td><strong>7</strong></td>
+        <td>Q4 2028</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Portfolio cashflow + trust equity</td>
+        <td>Earlier deals turning cashflow-positive absorb new acquisition losses</td>
       </tr>
       <tr>
-        <td>Section 100A Risk</td>
-        <td>ATO targeting distributions where money doesn't follow the resolution (e.g. distribute to adult child but parents keep the cash). Must be genuine. Reimbursement agreements are void.
-          <div class="verdict-tag verdict-risk">Trust risk</div>
-        </td>
-        <td>No equivalent risk — income is what it is.</td>
+        <td><strong>8</strong></td>
+        <td>2029 H1</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity recycling</td>
+        <td>Sustained rhythm from trust-internal cashflow</td>
+      </tr>
+      <tr>
+        <td><strong>9</strong></td>
+        <td>2029 H2</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity recycling</td>
+        <td>Portfolio likely net positive cashflow by here</td>
+      </tr>
+      <tr>
+        <td><strong>10</strong></td>
+        <td>2030 H1</td>
+        <td><span class="tag tag-trust">Trust</span></td>
+        <td>Apricot Family Trust</td>
+        <td>80%</td>
+        <td>Equity recycling</td>
+        <td><strong>Goal complete — ~4 years from McPherson</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 12px;">The Selection Call That Moves These Dates</h3>
+
+  <div class="option-card" style="max-width: 600px;">
+    <div class="option-title" style="color: var(--purple);">Which 50%-split lender takes #2 (and stays viable through #5+)</div>
+    <div class="option-row"><span class="label">Decision</span><span class="value">Lender choice for #2 in August 2026</span></div>
+    <div style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">
+      <p style="margin-bottom: 10px;"><strong style="color: var(--green);">Candidate set:</strong> Macquarie, Liberty, Pepper, Firstmac, Adelaide Bank, Bankwest. Each ~$218K against Tim/Mai per trust loan = 10 properties realistic by mid-2030.</p>
+      <p><strong>Selection criteria:</strong> rate + offset availability + trust-policy fit + appetite to keep writing through #3, #4, #5+. Picking a lender that splits at #2 but tightens at #4 wastes the structural advantage — broker brief is to shortlist 2–3 that hold their policy across multiple trust loans.</p>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-box">
+      <h4>Plan Horizon</h4>
+      <div class="big-number">~4 yrs</div>
+      <div class="detail">May 2026 → mid-2030 base case. 3 deals year 1, 2/yr thereafter slowing into 2030.</div>
+    </div>
+    <div class="summary-box">
+      <h4>Individual : Trust Split</h4>
+      <div class="big-number">1 : 9</div>
+      <div class="detail">#1 Mai (grandfathered) only individual. #2–10 in Apricot Family Trust. Fork 1 resolved 16 May — Tim's waiver doesn't extend.</div>
+    </div>
+    <div class="summary-box">
+      <h4>Portfolio Value at #10</h4>
+      <div class="big-number">~$4.85M</div>
+      <div class="detail">10 × ~$485K avg, ignoring capital growth. With ~5%/yr growth, portfolio value at 2030 ~$6M+.</div>
+    </div>
+    <div class="summary-box">
+      <h4>Critical Gate</h4>
+      <div class="big-number">29 May</div>
+      <div class="detail">McPherson finance approved (Mai individual @ 90%). #2 lender selected from 50%-split shortlist (Macquarie / Liberty / Pepper / Firstmac / Adelaide / Bankwest) by mid-June.</div>
+    </div>
+  </div>
+</div>
+
+<!-- KEY ASSUMPTIONS -->
+<div class="section">
+  <h2>Key Assumptions &amp; Caveats</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13px;">
+    <div>
+      <ul style="list-style: none; color: var(--text-muted);">
+        <li style="padding: 4px 0;">• Rates as quoted by Jenny Huang (Grab Home Loans) on 15 May 2026</li>
+        <li style="padding: 4px 0;">• VIC stamp duty estimated at ~$25K on $485K purchase</li>
+        <li style="padding: 4px 0;">• Expenses: council $2,006 + insurance $1,500 + mgmt 8% + water $800 + maintenance $1,500</li>
+        <li style="padding: 4px 0;">• LMI waiver confirmed as <strong>individual only</strong> — does not apply through a trust</li>
+        <li style="padding: 4px 0;">• LMI estimate ~$10K at 90% LVR on $485K (indicative — lender-specific)</li>
+      </ul>
+    </div>
+    <div>
+      <ul style="list-style: none; color: var(--text-muted);">
+        <li style="padding: 4px 0;">• Trust admin costs ~$1.5–2K/yr (ASIC, accounting, tax return)</li>
+        <li style="padding: 4px 0;">• 30% minimum trust tax has <strong>no impact</strong> at Tim/Mai's marginal rates (45%)</li>
+        <li style="padding: 4px 0;">• Negative gearing losses in a trust carry forward <strong>indefinitely</strong></li>
+        <li style="padding: 4px 0;">• Portfolio projection uses ~$485K avg — actual prices will vary by market</li>
+        <li style="padding: 4px 0;">• <strong>Not financial advice</strong> — confirm structure with accountant before each purchase</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ACTION CHECKLIST -->
+<div class="section">
+  <h2>Next 90 Days — Critical Path <span class="badge badge-green">Action</span></h2>
+  <table class="portfolio">
+    <thead>
+      <tr><th>Window</th><th>Action</th><th>Why It Matters</th></tr>
+    </thead>
+    <tbody>
+      <tr class="section-header"><td colspan="3">This week</td></tr>
+      <tr>
+        <td><strong>Now</strong></td>
+        <td>Confirm broker handover from Jenny Huang (Grab Home Loans sold per PK community, Apr 30 2026)</td>
+        <td>Whoever picks up the file holds the LMI waiver relationship and Option A pricing</td>
+      </tr>
+      <tr>
+        <td><strong>Now</strong></td>
+        <td>Confirm Apricot Family Trust admin is current (ASIC review, tax return status, trustee details up to date)</td>
+        <td>Trust is already established — verify it's deployment-ready, not freshly setting it up</td>
+      </tr>
+      <tr class="section-header"><td colspan="3">Before 29 May (McPherson finance deadline)</td></tr>
+      <tr>
+        <td><strong>By 29 May</strong></td>
+        <td>Finance approved on McPherson — Option A (Mai individual @ 90%)</td>
+        <td>Captures one-time grandfathered neg-gearing-vs-PAYG offset</td>
+      </tr>
+      <tr class="section-header"><td colspan="3">June 2026 — #2 lender selection</td></tr>
+      <tr>
+        <td><strong>Mid-June</strong></td>
+        <td>Broker: shortlist 2–3 of {Macquarie, Liberty, Pepper, Firstmac, Adelaide, Bankwest} based on current trust-policy + rate + offset</td>
+        <td>Narrow the candidate set to lenders that (a) still split 50% as of mid-2026, (b) have appetite for repeat trust loans through #3–#5</td>
+      </tr>
+      <tr>
+        <td><strong>Mid-June</strong></td>
+        <td>Broker: get actual borrowing capacity numbers for Tim &amp; Mai under each shortlisted lender</td>
+        <td>Replaces the $2.5M placeholder ceilings in the model with real numbers — sharpens the headroom picture and confirms #5 is reachable</td>
+      </tr>
+      <tr>
+        <td><strong>Late June</strong></td>
+        <td>Run actual lender calculators for #2 across the shortlisted lenders on a real target property</td>
+        <td>PK's prescription (Jul 2025 reply to Brian Liu): "model side-by-side using actual lender calculators"</td>
+      </tr>
+      <tr class="section-header"><td colspan="3">Capital deployment</td></tr>
+      <tr>
+        <td><strong>July 2026</strong></td>
+        <td>$150K lands — execute #2 if structure decided + target property ready</td>
+        <td>Compounding deal velocity is the priority; don't let capital sit idle</td>
+      </tr>
+      <tr>
+        <td><strong>October 2026</strong></td>
+        <td>$100K lands — execute #3 inside the family trust</td>
+        <td>Trust capacity preservation begins working from this point onwards</td>
       </tr>
     </tbody>
   </table>
 </div>
 
-<!-- COST ESTIMATOR TAB -->
-<div class="tab-content" id="tab-costs">
+<!-- INTERACTIVE FINANCIAL MODEL -->
+<div class="section">
+  <h2>Interactive Financial Model <span class="badge badge-purple">Live</span></h2>
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    Flex the assumptions. Defaults match the McPherson base case + capital cadence above. All calculations run live in-browser; nothing saves or syncs.
+  </p>
 
-  <div class="slider-row">
-    <label>Number of properties</label>
-    <input type="range" id="propCount" min="1" max="10" value="3" oninput="updateCosts()">
-    <span class="slider-val" id="propCountVal">3</span>
-  </div>
-
-  <div class="slider-row">
-    <label>Avg. property value</label>
-    <input type="range" id="propValue" min="300" max="2000" step="50" value="650" oninput="updateCosts()">
-    <span class="slider-val" id="propValueVal">$650k</span>
-  </div>
-
-  <div class="slider-row">
-    <label>Annual rental yield</label>
-    <input type="range" id="rentalYield" min="2" max="8" step="0.5" value="5" oninput="updateCosts()">
-    <span class="slider-val" id="rentalYieldVal">5.0%</span>
-  </div>
-
-  <div class="cost-grid">
-    <div class="cost-col">
-      <h3 style="color:var(--green)">Trust Structure</h3>
-      <div class="cost-line"><span>Trust deed setup</span><span class="amount" id="c_deed">$2,500</span></div>
-      <div class="cost-line"><span>Corporate trustee setup (Pty Ltd)</span><span class="amount" id="c_company">$1,200</span></div>
-      <div class="cost-line"><span>ABN / TFN registration</span><span class="amount">$0</span></div>
-      <div class="cost-line"><span>ASIC annual fee (company)</span><span class="amount">$310/yr</span></div>
-      <div class="cost-line"><span>Trust tax return (accountant)</span><span class="amount" id="c_taxReturn">$1,500/yr</span></div>
-      <div class="cost-line"><span>Company tax return</span><span class="amount">$500/yr</span></div>
-      <div class="cost-line"><span>Land tax surcharge (est.)</span><span class="amount" id="c_landTax">varies</span></div>
-      <div class="cost-total"><span>Year 1 total (est.)</span><span id="c_trustY1">—</span></div>
-      <div class="cost-total"><span>Ongoing per year (est.)</span><span id="c_trustOngoing">—</span></div>
+  <div class="model-wrap">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="cf">Property Cashflow</button>
+      <button class="tab-btn" data-tab="srv">Serviceability</button>
+      <button class="tab-btn" data-tab="cap">Capital Cadence</button>
+      <button class="tab-btn" data-tab="proj">10-Year Projection</button>
     </div>
-    <div class="cost-col">
-      <h3 style="color:var(--amber)">Individual (Joint Names)</h3>
-      <div class="cost-line"><span>Setup cost</span><span class="amount">$0</span></div>
-      <div class="cost-line"><span>Extra entity fees</span><span class="amount">$0</span></div>
-      <div class="cost-line"><span>ABN / TFN</span><span class="amount">Already have</span></div>
-      <div class="cost-line"><span>ASIC fees</span><span class="amount">$0</span></div>
-      <div class="cost-line"><span>Tax return (rental schedule)</span><span class="amount" id="c_indivTax">$800/yr</span></div>
-      <div class="cost-line"><span>—</span><span class="amount">—</span></div>
-      <div class="cost-line"><span>Land tax (threshold benefit)</span><span class="amount" id="c_indivLandTax">likely $0</span></div>
-      <div class="cost-total"><span>Year 1 total (est.)</span><span id="c_indivY1">—</span></div>
-      <div class="cost-total"><span>Ongoing per year (est.)</span><span id="c_indivOngoing">—</span></div>
+
+    <!-- TAB 1: PROPERTY CASHFLOW -->
+    <div class="tab-panel active" id="tab-cf">
+      <div class="model-grid">
+        <div class="controls">
+          <div class="ctrl">
+            <label>Purchase price</label>
+            <span class="ctrl-val" id="cf-price-v">$485,000</span>
+            <input type="range" id="cf-price" min="300000" max="900000" step="5000" value="485000">
+          </div>
+          <div class="ctrl">
+            <label>LVR</label>
+            <span class="ctrl-val" id="cf-lvr-v">90%</span>
+            <input type="range" id="cf-lvr" min="50" max="95" step="1" value="90">
+          </div>
+          <div class="ctrl">
+            <label>Interest rate</label>
+            <span class="ctrl-val" id="cf-rate-v">6.47%</span>
+            <input type="range" id="cf-rate" min="3" max="10" step="0.01" value="6.47">
+          </div>
+          <div class="ctrl">
+            <label>Loan type</label>
+            <span></span>
+            <div class="toggle-group" style="grid-column: 1 / -1;">
+              <button class="active" data-cf-type="io">Interest-Only</button>
+              <button data-cf-type="pi">P&amp;I (30yr)</button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <label>Weekly rent</label>
+            <span class="ctrl-val" id="cf-rent-v">$470</span>
+            <input type="range" id="cf-rent" min="200" max="1500" step="5" value="470">
+          </div>
+          <div class="ctrl">
+            <label>Vacancy rate</label>
+            <span class="ctrl-val" id="cf-vac-v">2%</span>
+            <input type="range" id="cf-vac" min="0" max="15" step="0.5" value="2">
+          </div>
+          <div class="ctrl">
+            <label>Property mgmt fee</label>
+            <span class="ctrl-val" id="cf-mgmt-v">8%</span>
+            <input type="range" id="cf-mgmt" min="0" max="12" step="0.5" value="8">
+          </div>
+          <div class="ctrl">
+            <label>Council + water + insurance + maint (annual)</label>
+            <span class="ctrl-val" id="cf-fixed-v">$5,806</span>
+            <input type="range" id="cf-fixed" min="2000" max="15000" step="100" value="5806">
+          </div>
+          <div class="ctrl">
+            <label>Marginal tax rate (for after-tax)</label>
+            <span class="ctrl-val" id="cf-tax-v">45%</span>
+            <input type="range" id="cf-tax" min="0" max="47" step="1" value="45">
+          </div>
+          <div class="ctrl">
+            <label>Negative gearing offsets PAYG?</label>
+            <span></span>
+            <div class="toggle-group" style="grid-column: 1 / -1;">
+              <button class="active" data-cf-ng="yes">Yes (grandfathered)</button>
+              <button data-cf-ng="no">No (post-12-May)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-row"><span class="out-label">Loan amount</span><span class="out-val" id="cf-out-loan">—</span></div>
+          <div class="out-row"><span class="out-label">Annual interest / repayment</span><span class="out-val" id="cf-out-int">—</span></div>
+          <div class="out-row"><span class="out-label">Annual rent (after vacancy)</span><span class="out-val" id="cf-out-rent">—</span></div>
+          <div class="out-row"><span class="out-label">Mgmt fees</span><span class="out-val" id="cf-out-mgmt">—</span></div>
+          <div class="out-row"><span class="out-label">Fixed expenses</span><span class="out-val" id="cf-out-fixed">—</span></div>
+          <div class="out-row"><span class="out-label">Annual gross shortfall</span><span class="out-val" id="cf-out-gross">—</span></div>
+          <div class="out-row headline"><span class="out-label">After-tax weekly out-of-pocket</span><span class="out-val" id="cf-out-wk">—</span></div>
+          <div class="out-row"><span class="out-label">Gross yield</span><span class="out-val" id="cf-out-gy">—</span></div>
+          <div class="out-row"><span class="out-label">Net yield (after expenses, pre-interest)</span><span class="out-val" id="cf-out-ny">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SERVICEABILITY -->
+    <div class="tab-panel" id="tab-srv">
+      <div class="model-grid">
+        <div class="controls">
+          <div class="ctrl">
+            <label>Mai's individual capacity ceiling</label>
+            <span class="ctrl-val" id="srv-mai-v">$2.5M</span>
+            <input type="range" id="srv-mai" min="500000" max="5000000" step="50000" value="2500000">
+          </div>
+          <div class="ctrl">
+            <label>Tim's individual capacity ceiling</label>
+            <span class="ctrl-val" id="srv-tim-v">$2.5M</span>
+            <input type="range" id="srv-tim" min="500000" max="5000000" step="50000" value="2500000">
+          </div>
+          <div class="ctrl">
+            <label>Avg loan per property</label>
+            <span class="ctrl-val" id="srv-loan-v">$388,000</span>
+            <input type="range" id="srv-loan" min="200000" max="800000" step="5000" value="388000">
+          </div>
+          <div class="ctrl">
+            <label>Mai's individual loans (e.g. McPherson = 1)</label>
+            <span class="ctrl-val" id="srv-maiInd-v">1</span>
+            <input type="range" id="srv-maiInd" min="0" max="5" step="1" value="1">
+          </div>
+          <div class="ctrl">
+            <label>Tim's individual loans</label>
+            <span class="ctrl-val" id="srv-timInd-v">0</span>
+            <input type="range" id="srv-timInd" min="0" max="5" step="1" value="0">
+          </div>
+          <div class="ctrl">
+            <label>Trust loans (T+M guarantor)</label>
+            <span class="ctrl-val" id="srv-trust-v">9</span>
+            <input type="range" id="srv-trust" min="0" max="20" step="1" value="9">
+          </div>
+          <div class="ctrl">
+            <label>Lender attribution of trust debt</label>
+            <span></span>
+            <div class="toggle-group" style="grid-column: 1 / -1;">
+              <button class="active" data-srv-attr="50">50% per guarantor</button>
+              <button data-srv-attr="100">100% per guarantor</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-row"><span class="out-label">Mai — total exposure</span><span class="out-val" id="srv-out-mai">—</span></div>
+          <div class="out-row"><span class="out-label">Mai — capacity used</span><span class="out-val" id="srv-out-maiPct">—</span></div>
+          <div class="out-row"><span class="out-label">Tim — total exposure</span><span class="out-val" id="srv-out-tim">—</span></div>
+          <div class="out-row"><span class="out-label">Tim — capacity used</span><span class="out-val" id="srv-out-timPct">—</span></div>
+          <div class="out-row"><span class="out-label">Total portfolio debt</span><span class="out-val" id="srv-out-total">—</span></div>
+          <div class="out-row headline"><span class="out-label">Properties supported before either ceiling hits</span><span class="out-val" id="srv-out-room">—</span></div>
+          <div class="out-row"><span class="out-label">Headroom remaining (limiting party)</span><span class="out-val" id="srv-out-head">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CAPITAL CADENCE -->
+    <div class="tab-panel" id="tab-cap">
+      <div class="model-grid">
+        <div class="controls">
+          <div class="ctrl">
+            <label>Starting cash (now)</label>
+            <span class="ctrl-val" id="cap-start-v">$135,000</span>
+            <input type="range" id="cap-start" min="0" max="500000" step="5000" value="135000">
+          </div>
+          <div class="ctrl">
+            <label>July 2026 inflow</label>
+            <span class="ctrl-val" id="cap-jul-v">$150,000</span>
+            <input type="range" id="cap-jul" min="0" max="500000" step="5000" value="150000">
+          </div>
+          <div class="ctrl">
+            <label>October 2026 inflow</label>
+            <span class="ctrl-val" id="cap-oct-v">$100,000</span>
+            <input type="range" id="cap-oct" min="0" max="500000" step="5000" value="100000">
+          </div>
+          <div class="ctrl">
+            <label>Cash per individual deal (dep + costs, 90% LVR)</label>
+            <span class="ctrl-val" id="cap-ind-v">$76,500</span>
+            <input type="range" id="cap-ind" min="40000" max="200000" step="500" value="76500">
+          </div>
+          <div class="ctrl">
+            <label>Cash per trust deal (dep + costs, 80% LVR)</label>
+            <span class="ctrl-val" id="cap-trust-v">$125,000</span>
+            <input type="range" id="cap-trust" min="60000" max="250000" step="500" value="125000">
+          </div>
+          <div class="ctrl">
+            <label>Per-property weekly OOP holding cost</label>
+            <span class="ctrl-val" id="cap-hold-v">$200/wk</span>
+            <input type="range" id="cap-hold" min="0" max="500" step="10" value="200">
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-row headline"><span class="out-label">Deals fundable through Oct 2026</span><span class="out-val" id="cap-out-deals">—</span></div>
+          <div class="out-row"><span class="out-label">Cash remaining after planned 3 deals</span><span class="out-val" id="cap-out-rem">—</span></div>
+          <div class="out-row"><span class="out-label">Annual portfolio holding cost (3 props)</span><span class="out-val" id="cap-out-hold">—</span></div>
+
+          <div class="timeline">
+            <div class="timeline-row head"><span>Month</span><span>Cash balance</span><span>Event</span><span>End</span></div>
+            <div id="cap-timeline"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: 10-YEAR PROJECTION -->
+    <div class="tab-panel" id="tab-proj">
+      <div class="model-grid">
+        <div class="controls">
+          <div class="ctrl">
+            <label>Properties at end of acquisition phase</label>
+            <span class="ctrl-val" id="pr-n-v">10</span>
+            <input type="range" id="pr-n" min="1" max="15" step="1" value="10">
+          </div>
+          <div class="ctrl">
+            <label>Avg purchase price</label>
+            <span class="ctrl-val" id="pr-px-v">$485,000</span>
+            <input type="range" id="pr-px" min="300000" max="900000" step="10000" value="485000">
+          </div>
+          <div class="ctrl">
+            <label>Avg LVR at purchase</label>
+            <span class="ctrl-val" id="pr-lvr-v">82%</span>
+            <input type="range" id="pr-lvr" min="50" max="95" step="1" value="82">
+          </div>
+          <div class="ctrl">
+            <label>Capital growth p.a.</label>
+            <span class="ctrl-val" id="pr-cg-v">5.0%</span>
+            <input type="range" id="pr-cg" min="0" max="12" step="0.1" value="5">
+          </div>
+          <div class="ctrl">
+            <label>Rent growth p.a.</label>
+            <span class="ctrl-val" id="pr-rg-v">3.0%</span>
+            <input type="range" id="pr-rg" min="0" max="8" step="0.1" value="3">
+          </div>
+          <div class="ctrl">
+            <label>Avg starting gross yield</label>
+            <span class="ctrl-val" id="pr-gy-v">5.0%</span>
+            <input type="range" id="pr-gy" min="2" max="10" step="0.1" value="5">
+          </div>
+          <div class="ctrl">
+            <label>Avg interest rate</label>
+            <span class="ctrl-val" id="pr-ir-v">6.7%</span>
+            <input type="range" id="pr-ir" min="3" max="10" step="0.05" value="6.7">
+          </div>
+          <div class="ctrl">
+            <label>Acquisition pace (months between deals after #3)</label>
+            <span class="ctrl-val" id="pr-pace-v">6 mo</span>
+            <input type="range" id="pr-pace" min="3" max="18" step="1" value="6">
+          </div>
+          <div class="ctrl">
+            <label>IO period (years before P&amp;I roll)</label>
+            <span class="ctrl-val" id="pr-io-v">5 yrs</span>
+            <input type="range" id="pr-io" min="0" max="10" step="1" value="5">
+          </div>
+        </div>
+
+        <div class="outputs">
+          <div class="out-row headline"><span class="out-label">Net portfolio equity at year 10</span><span class="out-val" id="pr-out-eq">—</span></div>
+          <div class="out-row"><span class="out-label">Portfolio value</span><span class="out-val" id="pr-out-val">—</span></div>
+          <div class="out-row"><span class="out-label">Total debt</span><span class="out-val" id="pr-out-debt">—</span></div>
+          <div class="out-row"><span class="out-label">Annual gross rent (year 10)</span><span class="out-val" id="pr-out-rent">—</span></div>
+          <div class="out-row"><span class="out-label">Annual interest (year 10)</span><span class="out-val" id="pr-out-intr">—</span></div>
+          <div class="out-row"><span class="out-label">Net cashflow before tax (year 10)</span><span class="out-val" id="pr-out-cf">—</span></div>
+
+          <svg class="chart" id="pr-chart" viewBox="0 0 600 320" preserveAspectRatio="none"></svg>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-swatch" style="background:#a78bfa;"></span>Portfolio value</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#f87171;"></span>Total debt</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#4ade80;"></span>Net equity</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="callout" id="costCallout">
-    <strong>Net cost of the trust structure</strong>
-    <span id="costDiff">—</span>
-  </div>
+  <p style="color: var(--text-muted); font-size: 11px; margin-top: 12px;">
+    Model uses simplifying assumptions: flat rates over the projection horizon, even acquisition spacing, no refinancing costs, no CGT, no stamp duty in projection (already in upfront cash), no rate steps. Use as a directional model, not a precise forecast.
+  </p>
 </div>
-
-<!-- SCENARIOS TAB -->
-<div class="tab-content" id="tab-scenarios">
-
-  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Click a scenario to see the recommendation.</p>
-
-  <div class="scenario-grid">
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>Young couple, first investment property</h3>
-      <p>Both on PAYG income. High LVR needed. Property likely negatively geared for 3-5 years.</p>
-      <span class="rec rec-individual">Individual names recommended</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Negative gearing benefits are immediate and meaningful on PAYG income. Trust setup costs aren't justified for one property. Simpler lending. Revisit when portfolio reaches 2-3 properties and cashflow turns positive.
-      </div>
-    </div>
-
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>Growing portfolio (3-5 properties), one high earner</h3>
-      <p>Portfolio transitioning to cashflow-positive. Income disparity between partners. Long-term hold strategy.</p>
-      <span class="rec rec-trust">Trust recommended</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Income distribution flexibility becomes very valuable with income disparity. Asset protection scales with portfolio size. Land tax surcharge is a cost but is offset by tax savings from income splitting. The negative gearing loss is minimal once properties are cashflow-neutral or positive.
-      </div>
-    </div>
-
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>Business owners with liability exposure</h3>
-      <p>One or both partners run a business. Potential for litigation or creditor claims. Properties are wealth preservation.</p>
-      <span class="rec rec-trust">Trust strongly recommended</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Asset protection is the primary driver. A properly structured discretionary trust with a corporate trustee provides the strongest barrier between business liabilities and the property portfolio. This alone can justify the ongoing costs.
-      </div>
-    </div>
-
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>Older couple, estate planning focus</h3>
-      <p>Properties are the main wealth asset. Concerned about smooth transfer to children. Want to avoid probate.</p>
-      <span class="rec rec-trust">Trust recommended</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Trust assets don't go through probate — no delays, no public record, no estate challenges. Appointor/guardian roles transfer smoothly. Can bring children in as beneficiaries gradually. No stamp duty on change of beneficiary. Watch the vesting date — ensure it extends far enough.
-      </div>
-    </div>
-
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>Couple with adult children earning low income</h3>
-      <p>Children are students, starting careers, or at home. Parents want to minimise family tax bill.</p>
-      <span class="rec rec-trust">Trust recommended</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Distributing rental income and capital gains to low-income adult children (18+) is the classic trust play. Must be genuine — child is a beneficiary, receives real distribution, must declare it. Section 100A risk if parents retain the cash and child "lends" it back.
-      </div>
-    </div>
-
-    <div class="scenario-card" onclick="toggleDetail(this)">
-      <h3>High-growth area, plan to sell within 5 years</h3>
-      <p>Buy-renovate-sell strategy. Capital gains are the primary return. Multiple flips planned.</p>
-      <span class="rec rec-depends">Depends on income levels</span>
-      <div class="scenario-detail" style="display:none;margin-top:12px;font-size:0.82rem;color:var(--muted);">
-        Trust lets you direct capital gains to the lowest-taxed beneficiary at sale time — massive advantage. But if held <12 months, no 50% discount for anyone. ATO may also treat frequent flips as business income (no CGT discount, assessed as ordinary income) — trust won't help with that classification. Get advice on the revenue vs capital account distinction.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DECISION MATRIX TAB -->
-<div class="tab-content" id="tab-matrix">
-
-  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Quick visual — green = advantage, red = disadvantage, amber = conditional.</p>
-
-  <div class="matrix-header">
-    <span></span>
-    <span>Trust</span>
-    <span>Individual</span>
-  </div>
-
-  <div class="matrix-row">
-    <div class="matrix-label">Asset Protection</div>
-    <div class="matrix-cell cell-green">Strong</div>
-    <div class="matrix-cell cell-red">Exposed</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Income Splitting</div>
-    <div class="matrix-cell cell-green">Flexible annually</div>
-    <div class="matrix-cell cell-red">Fixed by ownership</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Negative Gearing</div>
-    <div class="matrix-cell cell-red">Losses trapped</div>
-    <div class="matrix-cell cell-green">Offset salary</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Land Tax</div>
-    <div class="matrix-cell cell-red">Surcharge / no threshold</div>
-    <div class="matrix-cell cell-green">Threshold per person</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">CGT Discount</div>
-    <div class="matrix-cell cell-green">50% via beneficiaries</div>
-    <div class="matrix-cell cell-green">50% direct</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">CGT — Choose Recipient</div>
-    <div class="matrix-cell cell-green">Yes — any beneficiary</div>
-    <div class="matrix-cell cell-red">No — per ownership</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Estate / Succession</div>
-    <div class="matrix-cell cell-green">No probate</div>
-    <div class="matrix-cell cell-amber">Through estate</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Lending Access</div>
-    <div class="matrix-cell cell-amber">More restrictive</div>
-    <div class="matrix-cell cell-green">Standard resi</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Setup Cost</div>
-    <div class="matrix-cell cell-red">$2.5k–$5k</div>
-    <div class="matrix-cell cell-green">$0</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Ongoing Admin</div>
-    <div class="matrix-cell cell-amber">~$2.3k/yr</div>
-    <div class="matrix-cell cell-green">Minimal extra</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">Privacy</div>
-    <div class="matrix-cell cell-green">Company on title</div>
-    <div class="matrix-cell cell-red">Names on title</div>
-  </div>
-  <div class="matrix-row">
-    <div class="matrix-label">PPOR Exemption</div>
-    <div class="matrix-cell cell-red">Not available</div>
-    <div class="matrix-cell cell-green">Full exemption</div>
-  </div>
-
-  <div class="callout" style="margin-top:24px;">
-    <strong>Bottom line for most multi-property couples</strong>
-    Start in personal names for the first 1–2 negatively geared properties. Once the portfolio turns cashflow-positive (or you have adult children to distribute to), establish a trust for new acquisitions. Transferring existing properties into a trust triggers stamp duty + CGT — so plan the structure before you buy, not after.
-  </div>
-</div>
-
-<footer>
-  General information only — not legal, tax, or financial advice. Consult a qualified tax accountant and solicitor before structuring a property portfolio.
-  <br>Rates and thresholds are approximate (2024-25 FY) and vary by state. Generated May 2026.
-</footer>
 
 <script>
-function showTab(id) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  event.target.classList.add('active');
-  if (id === 'costs') updateCosts();
-}
+(function(){
+  const fmt = (n) => '$' + Math.round(n).toLocaleString();
+  const fmtK = (n) => {
+    if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+    if (Math.abs(n) >= 1e3) return '$' + Math.round(n/1e3) + 'K';
+    return '$' + Math.round(n);
+  };
+  const pct = (n) => (n*100).toFixed(1) + '%';
 
-function toggleDetail(card) {
-  const d = card.querySelector('.scenario-detail');
-  d.style.display = d.style.display === 'none' ? 'block' : 'none';
-}
+  // ===== Tabs =====
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
 
-function updateCosts() {
-  const n = parseInt(document.getElementById('propCount').value);
-  const v = parseInt(document.getElementById('propValue').value);
-  const y = parseFloat(document.getElementById('rentalYield').value);
-
-  document.getElementById('propCountVal').textContent = n;
-  document.getElementById('propValueVal').textContent = '$' + v + 'k';
-  document.getElementById('rentalYieldVal').textContent = y.toFixed(1) + '%';
-
-  const totalLandValue = n * v * 1000 * 0.5; // rough land component
-  const deedCost = 2500;
-  const companyCost = 1200;
-  const asicAnnual = 310;
-  const trustTaxReturn = 1000 + (n * 200);
-  const companyTaxReturn = 500;
-
-  document.getElementById('c_taxReturn').textContent = '$' + trustTaxReturn.toLocaleString() + '/yr';
-
-  // Land tax estimate (NSW-style rough calc)
-  let trustLandTax = 0;
-  let indivLandTax = 0;
-  const nswThreshold = 1075000;
-
-  if (totalLandValue > 100) {
-    trustLandTax = Math.max(0, (totalLandValue - 100) * 0.016 + 100);
-    trustLandTax += totalLandValue * 0.02; // surcharge
-  }
-  if (totalLandValue > nswThreshold * 2) {
-    indivLandTax = Math.max(0, (totalLandValue / 2 - nswThreshold) * 0.016 + 100) * 2;
+  // ===== Toggle groups =====
+  function bindToggle(attr, cb) {
+    document.querySelectorAll('[data-' + attr + ']').forEach(b => {
+      b.addEventListener('click', () => {
+        const group = b.parentElement;
+        group.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        cb(b.dataset[attr.replace(/-/g,'')]);
+      });
+    });
   }
 
-  document.getElementById('c_landTax').textContent = trustLandTax > 0 ? '$' + Math.round(trustLandTax).toLocaleString() + '/yr' : '$0';
-  document.getElementById('c_indivLandTax').textContent = indivLandTax > 0 ? '$' + Math.round(indivLandTax).toLocaleString() + '/yr' : 'likely $0';
+  // ===== TAB 1: Cashflow =====
+  const cfState = { type: 'io', ng: 'yes' };
+  bindToggle('cf-type', v => { cfState.type = v; renderCF(); });
+  bindToggle('cf-ng', v => { cfState.ng = v; renderCF(); });
 
-  const trustY1 = deedCost + companyCost + asicAnnual + trustTaxReturn + companyTaxReturn + trustLandTax;
-  const trustOngoing = asicAnnual + trustTaxReturn + companyTaxReturn + trustLandTax;
-  const indivY1 = 800 + indivLandTax;
-  const indivOngoing = 800 + indivLandTax;
+  function renderCF() {
+    const px = +document.getElementById('cf-price').value;
+    const lvr = +document.getElementById('cf-lvr').value / 100;
+    const rate = +document.getElementById('cf-rate').value / 100;
+    const rentWk = +document.getElementById('cf-rent').value;
+    const vac = +document.getElementById('cf-vac').value / 100;
+    const mgmtRate = +document.getElementById('cf-mgmt').value / 100;
+    const fixed = +document.getElementById('cf-fixed').value;
+    const tax = +document.getElementById('cf-tax').value / 100;
 
-  document.getElementById('c_trustY1').textContent = '$' + Math.round(trustY1).toLocaleString();
-  document.getElementById('c_trustOngoing').textContent = '$' + Math.round(trustOngoing).toLocaleString();
-  document.getElementById('c_indivY1').textContent = '$' + Math.round(indivY1).toLocaleString();
-  document.getElementById('c_indivOngoing').textContent = '$' + Math.round(indivOngoing).toLocaleString();
+    document.getElementById('cf-price-v').textContent = fmt(px);
+    document.getElementById('cf-lvr-v').textContent = (lvr*100).toFixed(0) + '%';
+    document.getElementById('cf-rate-v').textContent = (rate*100).toFixed(2) + '%';
+    document.getElementById('cf-rent-v').textContent = '$' + rentWk;
+    document.getElementById('cf-vac-v').textContent = (vac*100).toFixed(1) + '%';
+    document.getElementById('cf-mgmt-v').textContent = (mgmtRate*100).toFixed(1) + '%';
+    document.getElementById('cf-fixed-v').textContent = fmt(fixed);
+    document.getElementById('cf-tax-v').textContent = (tax*100).toFixed(0) + '%';
 
-  const diff = trustOngoing - indivOngoing;
-  const grossRent = n * v * 1000 * (y / 100);
-  document.getElementById('costDiff').textContent =
-    'The trust adds ~$' + Math.round(diff).toLocaleString() + '/yr in structural costs against $' +
-    Math.round(grossRent).toLocaleString() + '/yr gross rent. ' +
-    (diff < grossRent * 0.05 ? 'That\'s under 5% of gross rent — easily justified if tax savings exceed this.' :
-     'That\'s ' + (diff / grossRent * 100).toFixed(1) + '% of gross rent — weigh carefully against tax distribution savings.');
+    const loan = px * lvr;
+    let annualPayment;
+    if (cfState.type === 'io') {
+      annualPayment = loan * rate;
+    } else {
+      const r = rate / 12, n = 360;
+      const monthly = loan * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+      annualPayment = monthly * 12;
+    }
+    const grossRent = rentWk * 52;
+    const netRent = grossRent * (1 - vac);
+    const mgmtFee = netRent * mgmtRate;
+    const totalExp = mgmtFee + fixed;
+    const grossShortfall = netRent - totalExp - annualPayment;
+    let afterTax;
+    if (cfState.ng === 'yes' && grossShortfall < 0) {
+      afterTax = grossShortfall * (1 - tax);
+    } else {
+      afterTax = grossShortfall;
+    }
+    const wk = afterTax / 52;
 
-  document.getElementById('c_indivTax').textContent = '$' + (400 + n * 200).toLocaleString() + '/yr';
-}
+    document.getElementById('cf-out-loan').textContent = fmt(loan);
+    document.getElementById('cf-out-int').textContent = fmt(annualPayment);
+    document.getElementById('cf-out-rent').textContent = fmt(netRent);
+    document.getElementById('cf-out-mgmt').textContent = fmt(mgmtFee);
+    document.getElementById('cf-out-fixed').textContent = fmt(fixed);
+    const gs = document.getElementById('cf-out-gross');
+    gs.textContent = (grossShortfall >= 0 ? '+' : '') + fmt(grossShortfall);
+    gs.style.color = grossShortfall >= 0 ? 'var(--green)' : 'var(--red)';
+    const wkEl = document.getElementById('cf-out-wk');
+    wkEl.textContent = (wk >= 0 ? '+' : '') + '$' + Math.abs(Math.round(wk)) + '/wk';
+    wkEl.style.color = wk >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('cf-out-gy').textContent = pct(grossRent / px);
+    document.getElementById('cf-out-ny').textContent = pct((netRent - totalExp) / px);
+  }
+  ['cf-price','cf-lvr','cf-rate','cf-rent','cf-vac','cf-mgmt','cf-fixed','cf-tax']
+    .forEach(id => document.getElementById(id).addEventListener('input', renderCF));
 
-updateCosts();
+  // ===== TAB 2: Serviceability =====
+  const srvState = { attr: 50 };
+  bindToggle('srv-attr', v => { srvState.attr = +v; renderSRV(); });
+
+  function renderSRV() {
+    const maiCap = +document.getElementById('srv-mai').value;
+    const timCap = +document.getElementById('srv-tim').value;
+    const loan = +document.getElementById('srv-loan').value;
+    const maiInd = +document.getElementById('srv-maiInd').value;
+    const timInd = +document.getElementById('srv-timInd').value;
+    const trust = +document.getElementById('srv-trust').value;
+
+    document.getElementById('srv-mai-v').textContent = fmtK(maiCap);
+    document.getElementById('srv-tim-v').textContent = fmtK(timCap);
+    document.getElementById('srv-loan-v').textContent = fmt(loan);
+    document.getElementById('srv-maiInd-v').textContent = maiInd;
+    document.getElementById('srv-timInd-v').textContent = timInd;
+    document.getElementById('srv-trust-v').textContent = trust;
+
+    const trustShare = srvState.attr / 100;
+    const maiExp = maiInd * loan + trust * loan * trustShare;
+    const timExp = timInd * loan + trust * loan * trustShare;
+    const total = (maiInd + timInd + trust) * loan;
+    const maiPct = maiExp / maiCap;
+    const timPct = timExp / timCap;
+
+    document.getElementById('srv-out-mai').textContent = fmtK(maiExp);
+    document.getElementById('srv-out-maiPct').textContent = pct(maiPct);
+    document.getElementById('srv-out-tim').textContent = fmtK(timExp);
+    document.getElementById('srv-out-timPct').textContent = pct(timPct);
+    document.getElementById('srv-out-total').textContent = fmtK(total);
+
+    // Project additional trust deals till one ceiling hits
+    let extra = 0;
+    let mE = maiExp, tE = timExp;
+    while (mE + loan * trustShare <= maiCap && tE + loan * trustShare <= timCap && extra < 50) {
+      mE += loan * trustShare;
+      tE += loan * trustShare;
+      extra += 1;
+    }
+    const totalProps = maiInd + timInd + trust + extra;
+    document.getElementById('srv-out-room').textContent = totalProps + ' (' + extra + ' more trust)';
+    const headMai = maiCap - maiExp;
+    const headTim = timCap - timExp;
+    const limiter = headMai < headTim ? 'Mai' : 'Tim';
+    const headEl = document.getElementById('srv-out-head');
+    headEl.textContent = fmtK(Math.min(headMai, headTim)) + ' (' + limiter + ')';
+    headEl.style.color = Math.min(headMai, headTim) < 0 ? 'var(--red)' : 'var(--text)';
+  }
+  ['srv-mai','srv-tim','srv-loan','srv-maiInd','srv-timInd','srv-trust']
+    .forEach(id => document.getElementById(id).addEventListener('input', renderSRV));
+
+  // ===== TAB 3: Capital cadence =====
+  function renderCAP() {
+    const start = +document.getElementById('cap-start').value;
+    const jul = +document.getElementById('cap-jul').value;
+    const oct = +document.getElementById('cap-oct').value;
+    const indCash = +document.getElementById('cap-ind').value;
+    const trustCash = +document.getElementById('cap-trust').value;
+    const hold = +document.getElementById('cap-hold').value;
+
+    document.getElementById('cap-start-v').textContent = fmt(start);
+    document.getElementById('cap-jul-v').textContent = fmt(jul);
+    document.getElementById('cap-oct-v').textContent = fmt(oct);
+    document.getElementById('cap-ind-v').textContent = fmt(indCash);
+    document.getElementById('cap-trust-v').textContent = fmt(trustCash);
+    document.getElementById('cap-hold-v').textContent = '$' + hold + '/wk';
+
+    // Plan: #1 May (ind), #2 Aug (trust), #3 Nov (trust)
+    const events = [
+      { month: 'May 2026', label: 'Start', delta: 0 },
+      { month: 'May 2026', label: '#1 McPherson (Mai ind, 90%)', delta: -indCash },
+      { month: 'Jun 2026', label: 'Holding cost (1 prop, mo)', delta: -(hold * 52/12) },
+      { month: 'Jul 2026', label: '+$150K inflow', delta: +jul },
+      { month: 'Jul 2026', label: 'Holding cost (1 prop, mo)', delta: -(hold * 52/12) },
+      { month: 'Aug 2026', label: '#2 Apricot Trust (80%)', delta: -trustCash },
+      { month: 'Sep 2026', label: 'Holding cost (2 props, mo)', delta: -(hold * 2 * 52/12) },
+      { month: 'Oct 2026', label: '+$100K inflow', delta: +oct },
+      { month: 'Oct 2026', label: 'Holding cost (2 props, mo)', delta: -(hold * 2 * 52/12) },
+      { month: 'Nov 2026', label: '#3 Apricot Trust (80%)', delta: -trustCash },
+      { month: 'Dec 2026', label: 'Holding cost (3 props, mo)', delta: -(hold * 3 * 52/12) },
+    ];
+    let bal = start;
+    events[0].delta = start; // start row
+    let html = '';
+    let dealsFunded = 0;
+    events.forEach((e, i) => {
+      let prev = bal;
+      if (i === 0) bal = start;
+      else bal = prev + e.delta;
+      const isDeal = /^#\d/.test(e.label);
+      const ok = bal >= 0;
+      if (isDeal && ok) dealsFunded += 1;
+      const color = bal >= 0 ? 'var(--text)' : 'var(--red)';
+      const dColor = e.delta >= 0 ? 'var(--green)' : (isDeal ? 'var(--purple)' : 'var(--text-muted)');
+      const sign = e.delta >= 0 ? '+' : '';
+      html += `<div class="timeline-row">
+        <span style="color: var(--text-muted);">${e.month}</span>
+        <span>${e.label}</span>
+        <span style="color: ${dColor}; text-align: right;">${i===0 ? '' : sign + fmt(e.delta)}</span>
+        <span style="color: ${color}; text-align: right; font-weight:600;">${fmt(bal)}</span>
+      </div>`;
+    });
+    document.getElementById('cap-timeline').innerHTML = html;
+    document.getElementById('cap-out-deals').textContent = dealsFunded + ' of 3';
+    document.getElementById('cap-out-rem').textContent = fmt(bal);
+    document.getElementById('cap-out-rem').style.color = bal >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('cap-out-hold').textContent = fmt(hold * 52 * 3);
+  }
+  ['cap-start','cap-jul','cap-oct','cap-ind','cap-trust','cap-hold']
+    .forEach(id => document.getElementById(id).addEventListener('input', renderCAP));
+
+  // ===== TAB 4: 10-year projection =====
+  function renderPROJ() {
+    const N = +document.getElementById('pr-n').value;
+    const px = +document.getElementById('pr-px').value;
+    const lvr = +document.getElementById('pr-lvr').value / 100;
+    const cg = +document.getElementById('pr-cg').value / 100;
+    const rg = +document.getElementById('pr-rg').value / 100;
+    const gy = +document.getElementById('pr-gy').value / 100;
+    const ir = +document.getElementById('pr-ir').value / 100;
+    const pace = +document.getElementById('pr-pace').value;
+    const io = +document.getElementById('pr-io').value;
+
+    document.getElementById('pr-n-v').textContent = N;
+    document.getElementById('pr-px-v').textContent = fmt(px);
+    document.getElementById('pr-lvr-v').textContent = (lvr*100).toFixed(0) + '%';
+    document.getElementById('pr-cg-v').textContent = (cg*100).toFixed(1) + '%';
+    document.getElementById('pr-rg-v').textContent = (rg*100).toFixed(1) + '%';
+    document.getElementById('pr-gy-v').textContent = (gy*100).toFixed(1) + '%';
+    document.getElementById('pr-ir-v').textContent = (ir*100).toFixed(2) + '%';
+    document.getElementById('pr-pace-v').textContent = pace + ' mo';
+    document.getElementById('pr-io-v').textContent = io + ' yrs';
+
+    // Acquisition months from t=0: #1=0, #2=3, #3=6, then every `pace` months
+    const acqMonths = [];
+    if (N >= 1) acqMonths.push(0);
+    if (N >= 2) acqMonths.push(3);
+    if (N >= 3) acqMonths.push(6);
+    for (let i = 4; i <= N; i++) acqMonths.push(6 + (i - 3) * pace);
+
+    // Per property: purchase price, loan, age (in years from acquisition)
+    const props = acqMonths.map(m => ({
+      acqMonth: m,
+      px: px,
+      loan: px * lvr,
+    }));
+
+    // Build year-by-year series (year 0 = today)
+    const years = 10;
+    const series = [];
+    for (let y = 0; y <= years; y++) {
+      let value = 0, debt = 0, rent = 0, interest = 0;
+      props.forEach(p => {
+        const ageYrs = y - p.acqMonth / 12;
+        if (ageYrs < 0) return; // not yet acquired
+        const v = p.px * Math.pow(1 + cg, ageYrs);
+        value += v;
+        // Debt: IO for `io` years then 30yr P&I amortisation
+        let bal = p.loan;
+        if (ageYrs > io) {
+          const amYrs = ageYrs - io;
+          const r = ir / 12, nMo = 360;
+          const monthly = p.loan * r * Math.pow(1+r, nMo) / (Math.pow(1+r, nMo) - 1);
+          // simple closed-form remaining balance after amYrs*12 months
+          const k = amYrs * 12;
+          bal = p.loan * Math.pow(1+r, k) - monthly * (Math.pow(1+r, k) - 1) / r;
+          if (bal < 0) bal = 0;
+        }
+        debt += bal;
+        const rentY = p.px * gy * Math.pow(1 + rg, ageYrs);
+        rent += rentY;
+        interest += bal * ir;
+      });
+      series.push({ y, value, debt, rent, interest, equity: value - debt });
+    }
+
+    const last = series[years];
+    document.getElementById('pr-out-val').textContent = fmtK(last.value);
+    document.getElementById('pr-out-debt').textContent = fmtK(last.debt);
+    document.getElementById('pr-out-eq').textContent = fmtK(last.equity);
+    document.getElementById('pr-out-rent').textContent = fmtK(last.rent);
+    document.getElementById('pr-out-intr').textContent = fmtK(last.interest);
+    const cf = last.rent * 0.78 - last.interest; // rough: 22% expenses+mgmt+vacancy
+    const cfEl = document.getElementById('pr-out-cf');
+    cfEl.textContent = (cf >= 0 ? '+' : '') + fmtK(cf);
+    cfEl.style.color = cf >= 0 ? 'var(--green)' : 'var(--red)';
+
+    // Render SVG chart
+    const W = 600, H = 320, padL = 50, padR = 12, padT = 12, padB = 28;
+    const max = Math.max(...series.map(s => Math.max(s.value, s.debt, s.equity)));
+    const xStep = (W - padL - padR) / years;
+    const yScale = (H - padT - padB) / (max || 1);
+    const path = (key, color) => {
+      let d = '';
+      series.forEach((s, i) => {
+        const x = padL + i * xStep;
+        const y = H - padB - s[key] * yScale;
+        d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+      });
+      return `<path d="${d}" stroke="${color}" stroke-width="2" fill="none" />`;
+    };
+    // y-axis ticks
+    let yTicks = '';
+    const tickCount = 4;
+    for (let t = 0; t <= tickCount; t++) {
+      const v = (max / tickCount) * t;
+      const y = H - padB - v * yScale;
+      yTicks += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#2d3348" stroke-width="0.5" />`;
+      yTicks += `<text x="${padL-6}" y="${y+3}" text-anchor="end" font-size="10" fill="#8b90a0">${fmtK(v)}</text>`;
+    }
+    let xTicks = '';
+    for (let i = 0; i <= years; i++) {
+      const x = padL + i * xStep;
+      xTicks += `<text x="${x}" y="${H-8}" text-anchor="middle" font-size="10" fill="#8b90a0">Y${i}</text>`;
+    }
+    const svg = yTicks + xTicks +
+      path('value', '#a78bfa') +
+      path('debt', '#f87171') +
+      path('equity', '#4ade80');
+    document.getElementById('pr-chart').innerHTML = svg;
+  }
+  ['pr-n','pr-px','pr-lvr','pr-cg','pr-rg','pr-gy','pr-ir','pr-pace','pr-io']
+    .forEach(id => document.getElementById(id).addEventListener('input', renderPROJ));
+
+  // Initial renders
+  renderCF();
+  renderSRV();
+  renderCAP();
+  renderPROJ();
+})();
 </script>
+
+<div class="footer">
+  Prepared for Tim Nelson &amp; Mai Campbell &bull; 15 May 2026 &bull; Updated 16 May 2026 with scale-first priority, capital cadence &amp; interactive financial model &bull; Sources: Grab Home Loans broker quotes, 2026–27 Federal Budget (budget.gov.au), PK Property Investment Accelerator course material &amp; community forum sweep (16 May 2026)
+</div>
 
 </body>
 </html>
